@@ -7,7 +7,7 @@ import sys
 import pandas as pd
 import requests
 
-# --- 1. TU URL DEL LOGO (LA BUENA) ---
+# --- 1. TU URL DEL LOGO ---
 URL_LOGO = "https://raw.githubusercontent.com/AnalyzingBasketball/acb-newsletter-bot/refs/heads/main/logo.png"
 
 # --- 2. CONFIGURACIÓN ---
@@ -46,11 +46,12 @@ if webhook_make:
 print("📥 Enviando Email...")
 html_content = markdown.markdown(md_content)
 
+# CAMBIO: Cabecera azul eléctrico (#0044CC)
 plantilla = f"""
 <html><body style='font-family: Helvetica, Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px;'>
 <div style='background-color: #ffffff; max-width: 600px; margin: 0 auto; border: 1px solid #dddddd;'>
     
-    <div style='background-color: #000000; padding: 30px 20px; text-align: center;'>
+    <div style='background-color: #0044CC; padding: 30px 20px; text-align: center;'>
         <img src="{URL_LOGO}" alt="Analyzing Basketball" style="max-width: 150px; height: auto; display: block; margin: 0 auto;">
     </div>
 
