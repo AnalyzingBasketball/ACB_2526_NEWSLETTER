@@ -99,8 +99,8 @@ plantilla = f"""
 lista_emails = []
 if url_suscriptores:
     try:
-        # Leemos el CSV de Tally
-        df = pd.read_csv(url_suscriptores)
+        # Leemos el CSV ignorando líneas rotas para que no falle
+        df = pd.read_csv(url_suscriptores, on_bad_lines='skip', engine='python')
         
         # BUSCAMOS LA COLUMNA DE EMAILS (Columna D o la que tenga @)
         columna_emails = None
