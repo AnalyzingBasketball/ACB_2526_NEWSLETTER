@@ -48,7 +48,7 @@ team_stats['ORTG'] = (team_stats['PTS'] / team_stats['Game_Poss']) * 100
 best_offense = team_stats.sort_values('ORTG', ascending=False).iloc[0]
 txt_teams = f"Mejor Ataque: {best_offense['Team']} ({best_offense['ORTG']:.1f} pts/100 poss)."
 
-# --- 4. TENDENCIAS (SOLUCIÓN DEFINITIVA AST) ---
+# --- 4. TENDENCIAS (CORREGIDO: USA 'AST') ---
 jornadas = df['Week'].unique()
 txt_trends = "Datos insuficientes para tendencias."
 
@@ -56,15 +56,15 @@ if len(jornadas) >= 3:
     last_3 = jornadas[-3:]
     df_last = df[df['Week'].isin(last_3)]
     
-    # 1. Definimos las columnas que SIEMPRE están
+    # Definimos columnas obligatorias
     cols_calc = ['VAL', 'PTS', 'Reb_T']
     
-    # 2. Comprobamos si existe 'AST' (que sí existe, pero por seguridad)
+    # Comprobamos si existe 'AST' (Tu archivo usa 'AST')
     usa_ast = 'AST' in df.columns
     if usa_ast:
         cols_calc.append('AST')
     
-    # 3. Calculamos medias
+    # Calculamos medias
     means = df_last.groupby(['Name', 'Team'])[cols_calc].mean().reset_index()
     hot = means.sort_values('VAL', ascending=False).head(5)
     
