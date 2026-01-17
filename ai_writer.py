@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import google.generativeai as genai
 import sys
+import re  # <--- IMPORTANTE: Necesario para arreglar los nombres de equipos
 
 # --- CONFIGURACIÓN ---
 def guardar_salida(mensaje, nombre_archivo="newsletter_borrador.md"):
@@ -48,26 +49,26 @@ team_stats['ORTG'] = (team_stats['PTS'] / team_stats['Game_Poss']) * 100
 best_offense = team_stats.sort_values('ORTG', ascending=False).iloc[0]
 txt_teams = f"Mejor Ataque: {best_offense['Team']} ({best_offense['ORTG']:.1f} pts/100 poss)."
 
-# --- 4. TENDENCIAS (CON ASISTENCIAS) ---
+# --- 4. TENDENCIAS (CON ASISTENCIAS AÑADIDAS) ---
 jornadas = df['Week'].unique()
 txt_trends = "Datos insuficientes para tendencias."
 
-# CAMBIO SEGURIDAD: >= 1 para que NUNCA desaparezca la lista
+# Usamos >= 1 para asegurar que la lista salga SIEMPRE
 if len(jornadas) >= 1:
     last_3 = jornadas[-3:]
     df_last = df[df['Week'].isin(last_3)]
     
-    # CAMBIO: Añadimos 'AST' al cálculo
+    # 1. AÑADIMOS AST AQUI
     cols_calc = ['VAL', 'PTS', 'Reb_T', 'AST']
     means = df_last.groupby(['Name', 'Team'])[cols_calc].mean().reset_index()
     
     hot = means.sort_values('VAL', ascending=False).head(5)
     txt_trends = ""
     for _, row in hot.iterrows():
-        # CAMBIO: Añadimos las asistencias a la línea
+        # 2. AÑADIMOS AST AL TEXTO AQUI
         txt_trends += f"- {row['Name']} ({row['Team']}): {row['VAL']:.1f} VAL, {row['PTS']:.1f} PTS, {row['Reb_T']:.1f} REB, {row['AST']:.1f} AST.\n"
 
-# --- 5. PROMPT MEJORADO ---
+# --- 5. PROMPT ---
 prompt = f"""
 Actúa como Data Scientist de "Analyzing Basketball". Escribe un informe técnico de la {ultima_jornada_label}.
 
@@ -78,20 +79,20 @@ EQUIPO: {txt_teams}
 TENDENCIAS:
 {txt_trends}
 
-REGLAS DE ESTILO:
-1. "VALORACIÓN": En los párrafos narrativos, escribe SIEMPRE la palabra completa "valoración" en lugar de "VAL". En las listas de estadísticas mantén "VAL".
-2. FORMATO: Usa saltos de línea claros después de los títulos.
+INSTRUCCIONES DE REDACCIÓN:
+1. Usa "valoración" (palabra completa) en el texto narrativo. Usa "VAL" solo en las listas de datos.
+2. IMPORTANTE: Deja un espacio en blanco claro después de cada título de sección.
 
-ESTRUCTURA OBLIGATORIA (Respeta los dobles saltos de línea):
+ESTRUCTURA OBLIGATORIA:
 **INFORME TÉCNICO: {ultima_jornada_label}**
 
 **1. Análisis de Impacto Individual**
 
-[Analiza al MVP en 3 líneas. Usa "valoración" si hablas de su estadística total.]
+[Analiza al MVP en 3 líneas]
 
 **2. Cuadro de Honor**
 
-[Menciona a los destacados brevemente. Recuerda usar "valoración" en el texto.]
+[Menciona a los destacados brevemente]
 
 **3. Desempeño Colectivo**
 
@@ -99,24 +100,49 @@ ESTRUCTURA OBLIGATORIA (Respeta los dobles saltos de línea):
 
 **4. Proyección Estadística (Tendencias)**
 
-A continuación, los jugadores a vigilar la próxima semana por su estado de forma (Medias últimas 3 jornadas):
+A continuación, los jugadores a vigilar la próxima semana por su estado de forma (Medias últimas jornadas):
 
-[INSTRUCCIÓN CRÍTICA: Escribe la lista de tendencias usando saltos de línea reales. NO lo pongas todo en un párrafo.]
+[INSTRUCCIÓN CRÍTICA: Escribe la lista de tendencias usando saltos de línea reales.]
 {txt_trends}
 
 ---
 AB
 """
 
-# --- 6. GENERACIÓN Y LIMPIEZA ---
+# --- 6. GENERACIÓN, LIMPIEZA Y CORRECCIONES ---
 try:
     model = genai.GenerativeModel('gemini-2.5-flash')
     response = model.generate_content(prompt)
     
     texto_final = response.text
     
-    # TRUCO FINAL: Aseguramos que la lista se vea bien separada
+    # --- CORRECCIÓN 1: LISTA DE JUGADORES (Tu arreglo original) ---
     texto_final = texto_final.replace(". -", ".\n\n-").replace(": -", ":\n\n-")
+
+    # --- CORRECCIÓN 2: RENGLONES TRAS TÍTULOS (Forzado bruto) ---
+    # Busca títulos en negrita y asegura doble salto de línea
+    texto_final = texto_final.replace("**\n", "**\n\n") 
+    # Por si acaso Gemini no puso salto, busca el cierre de negrita y fuerza salto
+    texto_final = re.sub(r"(\*\*[^\n]+\*\* )", r"\1\n\n", texto_final)
+
+    # --- CORRECCIÓN 3: NOMBRES DE EQUIPOS (Regex Inteligente) ---
+    # Mapa de siglas ACB 2024-2025
+    team_map = {
+        'UNI': 'Unicaja', 'RMB': 'Real Madrid', 'FCB': 'Barça',
+        'VBC': 'Valencia Basket', 'TFU': 'Lenovo Tenerife', 'UCM': 'UCAM Murcia',
+        'GCB': 'Dreamland Gran Canaria', 'JOV': 'Joventut', 'BKN': 'Baskonia',
+        'MAN': 'BAXI Manresa', 'ZAR': 'Casademont Zaragoza', 'BIL': 'Surne Bilbao',
+        'GIR': 'Bàsquet Girona', 'BRE': 'Río Breogán', 'GRA': 'Covirán Granada',
+        'AND': 'MoraBanc Andorra', 'LLE': 'Hiopos Lleida', 'COR': 'Leyma Coruña'
+    }
+
+    def replace_acronym(match):
+        return team_map.get(match.group(1), match.group(1))
+
+    # Busca siglas QUE NO tengan un paréntesis antes '(' NI después ')'
+    # Así cambia "UNI" por "Unicaja", pero "Perry (UNI)" lo deja quieto.
+    pattern = r"(?<!\()(" + "|".join(team_map.keys()) + r")(?!\))"
+    texto_final = re.sub(pattern, replace_acronym, texto_final)
     
     guardar_salida(texto_final)
     
