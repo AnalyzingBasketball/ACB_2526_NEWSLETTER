@@ -48,21 +48,31 @@ team_stats['ORTG'] = (team_stats['PTS'] / team_stats['Game_Poss']) * 100
 best_offense = team_stats.sort_values('ORTG', ascending=False).iloc[0]
 txt_teams = f"Mejor Ataque: {best_offense['Team']} ({best_offense['ORTG']:.1f} pts/100 poss)."
 
-# --- 4. TENDENCIAS (DATOS AMPLIADOS) ---
+# --- 4. TENDENCIAS (CON ASISTENCIAS) ---
 jornadas = df['Week'].unique()
 txt_trends = "Datos insuficientes para tendencias."
+
 if len(jornadas) >= 3:
     last_3 = jornadas[-3:]
     df_last = df[df['Week'].isin(last_3)]
-    # Calculamos medias de VAL, PTS y REB
-    means = df_last.groupby(['Name', 'Team'])[['VAL', 'PTS', 'Reb_T']].mean().reset_index()
-    hot = means.sort_values('VAL', ascending=False).head(5)
-    txt_trends = ""
-    for _, row in hot.iterrows():
-        # Formato de datos crudos para que la IA tenga material
-        txt_trends += f"- {row['Name']} ({row['Team']}): {row['VAL']:.1f} VAL, {row['PTS']:.1f} PTS, {row['Reb_T']:.1f} REB (Media ult. 3 partidos).\n"
+    
+    # AQUI ESTÁ EL CAMBIO: Añadimos 'Assist' al cálculo
+    # (Si tu CSV usa otro nombre como 'AST', cámbialo aquí, pero suele ser 'Assist')
+    try:
+        cols_to_mean = ['VAL', 'PTS', 'Reb_T', 'Assist']
+        means = df_last.groupby(['Name', 'Team'])[cols_to_mean].mean().reset_index()
+        
+        hot = means.sort_values('VAL', ascending=False).head(5)
+        txt_trends = ""
+        for _, row in hot.iterrows():
+            # AQUI AÑADIMOS LAS ASISTENCIAS AL TEXTO
+            txt_trends += f"- {row['Name']} ({row['Team']}): {row['VAL']:.1f} VAL, {row['PTS']:.1f} PTS, {row['Reb_T']:.1f} REB, {row['Assist']:.1f} AST.\n"
+            
+    except KeyError:
+        # Por si acaso la columna se llama diferente en tu CSV
+        txt_trends = "No pude encontrar la columna de asistencias (Assist)."
 
-# --- 5. PROMPT ESTRICTO ---
+# --- 5. PROMPT ---
 prompt = f"""
 Actúa como Data Scientist de "Analyzing Basketball". Escribe un informe técnico de la {ultima_jornada_label}.
 
@@ -70,14 +80,14 @@ DATOS:
 MVP: {txt_mvp}
 TOP: {txt_rest}
 EQUIPO: {txt_teams}
-TENDENCIAS (Jugadores en racha últimas 3 jornadas):
+TENDENCIAS:
 {txt_trends}
 
 ESTRUCTURA OBLIGATORIA (Respeta los saltos de línea):
 **INFORME TÉCNICO: {ultima_jornada_label}**
 
 **1. Análisis de Impacto Individual**
-[Analiza al MVP en 3 líneas, destacando su eficiencia]
+[Analiza al MVP en 3 líneas]
 
 **2. Cuadro de Honor**
 [Menciona a los destacados brevemente]
@@ -88,13 +98,12 @@ ESTRUCTURA OBLIGATORIA (Respeta los saltos de línea):
 **4. Proyección Estadística (Tendencias)**
 A continuación, los jugadores a vigilar la próxima semana por su estado de forma (Medias últimas 3 jornadas):
 
-[INSTRUCCIÓN CRÍTICA: Escribe la lista de tendencias usando <br> o saltos de línea reales. NO lo pongas todo en un párrafo.]
+[INSTRUCCIÓN CRÍTICA: Escribe la lista de tendencias usando saltos de línea reales. NO lo pongas todo en un párrafo.]
 {txt_trends}
 
 ---
 AB
 """
-# (Fíjate que en la firma he puesto solo "AB" sin la palabra Firma:)
 
 # --- 6. GENERACIÓN Y LIMPIEZA ---
 try:
@@ -102,10 +111,6 @@ try:
     response = model.generate_content(prompt)
     
     texto_final = response.text
-    
-    # TRUCO FINAL: Forzamos saltos de línea en la lista si la IA falla
-    # Reemplazamos cualquier guion que esté pegado a texto anterior por un salto + guion
-    # (Esto arregla el problema visual que tenías)
     texto_final = texto_final.replace(". -", ".\n\n-").replace(": -", ":\n\n-")
     
     guardar_salida(texto_final)
