@@ -2,7 +2,7 @@ import pandas as pd
 import os
 import google.generativeai as genai
 import sys
-import re # IMPORTANTE: Necesario para el reemplazo inteligente de nombres
+import re
 
 # --- CONFIGURACIÓN ---
 def guardar_salida(mensaje, nombre_archivo="newsletter_borrador.md"):
@@ -49,28 +49,27 @@ team_stats['ORTG'] = (team_stats['PTS'] / team_stats['Game_Poss']) * 100
 best_offense = team_stats.sort_values('ORTG', ascending=False).iloc[0]
 txt_teams = f"Mejor Ataque: {best_offense['Team']} ({best_offense['ORTG']:.1f} pts/100 poss)."
 
-# --- 4. TENDENCIAS (CON ASISTENCIAS) ---
+# --- 4. TENDENCIAS (ARREGLADO: SIN BLOQUEOS) ---
 jornadas = df['Week'].unique()
-txt_trends = "Datos insuficientes para tendencias."
-if len(jornadas) >= 3:
-    last_3 = jornadas[-3:]
-    df_last = df[df['Week'].isin(last_3)]
-    
-    # MODIFICACIÓN: Añadir 'AST' a la lista de columnas
-    cols_to_mean = ['VAL', 'PTS', 'Reb_T']
-    if 'AST' in df.columns: cols_to_mean.append('AST')
-    
-    means = df_last.groupby(['Name', 'Team'])[cols_to_mean].mean().reset_index()
-    hot = means.sort_values('VAL', ascending=False).head(5)
-    txt_trends = ""
-    for _, row in hot.iterrows():
-        # MODIFICACIÓN: Añadir el dato de AST al texto si existe
-        linea = f"- {row['Name']} ({row['Team']}): {row['VAL']:.1f} VAL, {row['PTS']:.1f} PTS, {row['Reb_T']:.1f} REB"
-        if 'AST' in df.columns: linea += f", {row['AST']:.1f} AST"
-        linea += ".\n"
+
+# Cogemos lo que haya, sin exigir mínimo de 3
+last_3 = jornadas[-3:]
+df_last = df[df['Week'].isin(last_3)]
+
+# Columnas (incluyendo AST si existe)
+cols_calc = ['VAL', 'PTS', 'Reb_T']
+if 'AST' in df.columns: cols_calc.append('AST')
+
+means = df_last.groupby(['Name', 'Team'])[cols_calc].mean().reset_index()
+hot = means.sort_values('VAL', ascending=False).head(5)
+
+txt_trends = ""
+for _, row in hot.iterrows():
+    linea = f"- {row['Name']} ({row['Team']}): {row['VAL']:.1f} VAL, {row['PTS']:.1f} PTS, {row['Reb_T']:.1f} REB"
+    if 'AST' in df.columns: linea += f", {row['AST']:.1f} AST"
+    linea += ".\n"
 
 # --- 5. PROMPT ---
-# NOTA: He añadido \n después de cada título en negrita para forzar el salto de línea visual.
 prompt = f"""
 Actúa como Data Scientist senior de "Analyzing Basketball". Escribe un informe técnico y sobrio de la {ultima_jornada_label}.
 
@@ -81,22 +80,26 @@ EQUIPO: {txt_teams}
 TENDENCIAS:
 {txt_trends}
 
-ESTRUCTURA OBLIGATORIA DEL INFORME:
+ESTRUCTURA OBLIGATORIA (Usa DOBLES saltos de línea para separar párrafos):
 **INFORME TÉCNICO: {ultima_jornada_label}**
 
-**1. Análisis de Impacto Individual**\n
-[Analiza al MVP en un párrafo de 3-4 líneas, enfocándote en su eficiencia y por qué sus números importan más allá del boxscore básico.]
+**1. Análisis de Impacto Individual**
 
-**2. Cuadro de Honor**\n
-[Menciona brevemente a los otros destacados y qué aportaron a sus equipos.]
+[Analiza al MVP en un párrafo de 3-4 líneas.]
 
-**3. Desempeño Colectivo**\n
-[Analiza el mejor ataque mencionado en los datos.]
+**2. Cuadro de Honor**
 
-**4. Proyección Estadística (Tendencias)**\n
-A continuación, los jugadores a vigilar la próxima semana por su estado de forma (Medias últimas 3 jornadas):
+[Menciona brevemente a los otros destacados.]
 
-[INSTRUCCIÓN CRÍTICA: Copia la lista de tendencias TAL CUAL. Usa guiones para crear una lista vertical. NO añadas texto extra.]
+**3. Desempeño Colectivo**
+
+[Analiza el mejor ataque.]
+
+**4. Proyección Estadística (Tendencias)**
+
+A continuación, los jugadores a vigilar la próxima semana por su estado de forma (Medias últimas jornadas):
+
+[INSTRUCCIÓN CRÍTICA: Copia la lista de tendencias TAL CUAL. Usa guiones para crear una lista vertical.]
 {txt_trends}
 
 ---
@@ -109,8 +112,7 @@ try:
     response = model.generate_content(prompt)
     texto_final = response.text
 
-    # --- CAMBIO CLAVE: REEMPLAZO INTELIGENTE DE SIGLAS ---
-    # 1. Mapa de siglas a nombres completos (Ajusta si falta alguno de esta temporada)
+    # --- REEMPLAZO DE SIGLAS (LÓGICA MEJORADA) ---
     team_map = {
         'UNI': 'Unicaja', 'RMB': 'Real Madrid', 'FCB': 'Barça',
         'VBC': 'Valencia Basket', 'TFU': 'Lenovo Tenerife', 'UCM': 'UCAM Murcia',
@@ -118,29 +120,21 @@ try:
         'MAN': 'BAXI Manresa', 'ZAR': 'Casademont Zaragoza', 'BIL': 'Surne Bilbao Basket',
         'GIR': 'Bàsquet Girona', 'BRE': 'Río Breogán', 'OBR': 'Monbus Obradoiro',
         'GRA': 'Covirán Granada', 'PAL': 'Zunder Palencia', 'AND': 'MoraBanc Andorra',
-        'COV': 'Covirán Granada' # Por si acaso usa este
+        'LLE': 'Hiopos Lleida', 'COR': 'Leyma Coruña'
     }
 
-    # 2. Función que hace el reemplazo si encuentra una coincidencia
     def replace_team_acronym(match):
-        acronym = match.group(1) # La sigla encontrada (ej: UNI)
-        # Devuelve el nombre completo si está en el mapa, si no, devuelve la sigla original
+        acronym = match.group(1)
         return team_map.get(acronym, acronym)
 
-    # 3. La Expresión Regular Mágica:
-    # (?<!\()  -> Mira atrás y asegúrate de que NO hay un paréntesis abierto '('
-    # (...)    -> Busca cualquiera de las siglas de nuestro mapa (UNI|RMB|FCB...)
-    # (?!\))   -> Mira adelante y asegúrate de que NO hay un paréntesis cerrado ')'
+    # Regex: Busca siglas NO precedidas por '(' y NO seguidas por ')'
     pattern = r"(?<!\()(" + "|".join(team_map.keys()) + r")(?!\))"
-
-    # Aplicamos el reemplazo sobre el texto generado por Gemini
     texto_final_limpio = re.sub(pattern, replace_team_acronym, texto_final)
 
-    # --- LIMPIEZA FINAL DE FORMATO ---
+    # Forzamos doble salto de línea antes de los guiones para asegurar la lista
     texto_final_limpio = texto_final_limpio.replace(". -", ".\n\n-").replace(": -", ":\n\n-")
     
     guardar_salida(texto_final_limpio)
     
 except Exception as e:
     guardar_salida(f"❌ Error Gemini: {e}")
-
