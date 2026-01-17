@@ -48,18 +48,19 @@ team_stats['ORTG'] = (team_stats['PTS'] / team_stats['Game_Poss']) * 100
 best_offense = team_stats.sort_values('ORTG', ascending=False).iloc[0]
 txt_teams = f"Mejor Ataque: {best_offense['Team']} ({best_offense['ORTG']:.1f} pts/100 poss)."
 
-# --- 4. TENDENCIAS (PARA BULLETPOINTS) ---
-# Calculamos medias de las últimas 3 jornadas si existen
+# --- 4. TENDENCIAS (DATOS AMPLIADOS) ---
 jornadas = df['Week'].unique()
 txt_trends = "Datos insuficientes para tendencias."
 if len(jornadas) >= 3:
     last_3 = jornadas[-3:]
     df_last = df[df['Week'].isin(last_3)]
-    means = df_last.groupby(['Name', 'Team'])['VAL'].mean().reset_index()
-    hot = means.sort_values('VAL', ascending=False).head(4)
+    # Calculamos medias de VAL, PTS y REB
+    means = df_last.groupby(['Name', 'Team'])[['VAL', 'PTS', 'Reb_T']].mean().reset_index()
+    hot = means.sort_values('VAL', ascending=False).head(5)
     txt_trends = ""
     for _, row in hot.iterrows():
-        txt_trends += f"- {row['Name']} ({row['Team']}): {row['VAL']:.1f} VAL media.\n"
+        # Formato de datos crudos para que la IA tenga material
+        txt_trends += f"- {row['Name']} ({row['Team']}): {row['VAL']:.1f} VAL, {row['PTS']:.1f} PTS, {row['Reb_T']:.1f} REB (Media ult. 3 partidos).\n"
 
 # --- 5. PROMPT ESTRICTO ---
 prompt = f"""
@@ -69,13 +70,14 @@ DATOS:
 MVP: {txt_mvp}
 TOP: {txt_rest}
 EQUIPO: {txt_teams}
-TENDENCIAS: {txt_trends}
+TENDENCIAS (Jugadores en racha últimas 3 jornadas):
+{txt_trends}
 
-ESTRUCTURA OBLIGATORIA:
+ESTRUCTURA OBLIGATORIA (Respeta los saltos de línea):
 **INFORME TÉCNICO: {ultima_jornada_label}**
 
 **1. Análisis de Impacto Individual**
-[Analiza al MVP en 3 líneas]
+[Analiza al MVP en 3 líneas, destacando su eficiencia]
 
 **2. Cuadro de Honor**
 [Menciona a los destacados brevemente]
@@ -83,18 +85,30 @@ ESTRUCTURA OBLIGATORIA:
 **3. Desempeño Colectivo**
 [Menciona el mejor ataque]
 
-**4. Proyección Estadística**
-A continuación, los jugadores a vigilar la próxima semana:
-[IMPORTANTE: Usa una LISTA CON GUIONES (-). NO escribas párrafos aquí. Solo lista.]
+**4. Proyección Estadística (Tendencias)**
+A continuación, los jugadores a vigilar la próxima semana por su estado de forma (Medias últimas 3 jornadas):
+
+[INSTRUCCIÓN CRÍTICA: Escribe la lista de tendencias usando <br> o saltos de línea reales. NO lo pongas todo en un párrafo.]
+{txt_trends}
 
 ---
-Firma: AB
+AB
 """
+# (Fíjate que en la firma he puesto solo "AB" sin la palabra Firma:)
 
-# --- 6. GENERACIÓN ---
+# --- 6. GENERACIÓN Y LIMPIEZA ---
 try:
     model = genai.GenerativeModel('gemini-2.5-flash')
     response = model.generate_content(prompt)
-    guardar_salida(response.text)
+    
+    texto_final = response.text
+    
+    # TRUCO FINAL: Forzamos saltos de línea en la lista si la IA falla
+    # Reemplazamos cualquier guion que esté pegado a texto anterior por un salto + guion
+    # (Esto arregla el problema visual que tenías)
+    texto_final = texto_final.replace(". -", ".\n\n-").replace(": -", ":\n\n-")
+    
+    guardar_salida(texto_final)
+    
 except Exception as e:
     guardar_salida(f"❌ Error Gemini: {e}")
