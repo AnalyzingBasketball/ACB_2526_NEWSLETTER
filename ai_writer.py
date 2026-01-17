@@ -135,11 +135,11 @@ Resumen breve de los otros destacados, citando sus métricas de eficiencia.
 **3. Desempeño Colectivo (ORTG & Pace)**
 Análisis de los equipos destacados en eficiencia ofensiva y ritmo de juego.
 
-**4. Proyección Estadística (Tendencias)**
+**4. Tendencias para la próxima jornada**
 Menciona a los jugadores con mejor promedio en las últimas 3 jornadas como activos a vigilar.
 
 ---
-Firma: Analyzing Basketball
+Analyzing Basketball
 """
 
 # --- 6. GENERACIÓN ---
