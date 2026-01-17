@@ -2,7 +2,7 @@ import pandas as pd
 import os
 import google.generativeai as genai
 import sys
-import re  # <--- IMPORTANTE: Necesario para arreglar los nombres de equipos
+import re
 
 # --- CONFIGURACIÓN ---
 def guardar_salida(mensaje, nombre_archivo="newsletter_borrador.md"):
@@ -49,24 +49,23 @@ team_stats['ORTG'] = (team_stats['PTS'] / team_stats['Game_Poss']) * 100
 best_offense = team_stats.sort_values('ORTG', ascending=False).iloc[0]
 txt_teams = f"Mejor Ataque: {best_offense['Team']} ({best_offense['ORTG']:.1f} pts/100 poss)."
 
-# --- 4. TENDENCIAS (CON ASISTENCIAS AÑADIDAS) ---
+# --- 4. TENDENCIAS (CON DOBLE SALTO DE LÍNEA FORZADO) ---
 jornadas = df['Week'].unique()
 txt_trends = "Datos insuficientes para tendencias."
 
-# Usamos >= 1 para asegurar que la lista salga SIEMPRE
+# Usamos >= 1 para que salga SIEMPRE
 if len(jornadas) >= 1:
     last_3 = jornadas[-3:]
     df_last = df[df['Week'].isin(last_3)]
     
-    # 1. AÑADIMOS AST AQUI
     cols_calc = ['VAL', 'PTS', 'Reb_T', 'AST']
     means = df_last.groupby(['Name', 'Team'])[cols_calc].mean().reset_index()
-    
     hot = means.sort_values('VAL', ascending=False).head(5)
+    
     txt_trends = ""
     for _, row in hot.iterrows():
-        # 2. AÑADIMOS AST AL TEXTO AQUI
-        txt_trends += f"- {row['Name']} ({row['Team']}): {row['VAL']:.1f} VAL, {row['PTS']:.1f} PTS, {row['Reb_T']:.1f} REB, {row['AST']:.1f} AST.\n"
+        # AQUI: \n\n AL FINAL PARA QUE RESPIRE LA LISTA
+        txt_trends += f"- {row['Name']} ({row['Team']}): {row['VAL']:.1f} VAL, {row['PTS']:.1f} PTS, {row['Reb_T']:.1f} REB, {row['AST']:.1f} AST.\n\n"
 
 # --- 5. PROMPT ---
 prompt = f"""
@@ -79,9 +78,9 @@ EQUIPO: {txt_teams}
 TENDENCIAS:
 {txt_trends}
 
-INSTRUCCIONES DE REDACCIÓN:
-1. Usa "valoración" (palabra completa) en el texto narrativo. Usa "VAL" solo en las listas de datos.
-2. IMPORTANTE: Deja un espacio en blanco claro después de cada título de sección.
+INSTRUCCIONES DE FORMATO:
+1. Usa "valoración" en el texto narrativo. Usa "VAL" solo en las listas.
+2. IMPORTANTE: Usa saltos de línea dobles entre secciones.
 
 ESTRUCTURA OBLIGATORIA:
 **INFORME TÉCNICO: {ultima_jornada_label}**
@@ -102,45 +101,40 @@ ESTRUCTURA OBLIGATORIA:
 
 A continuación, los jugadores a vigilar la próxima semana por su estado de forma (Medias últimas jornadas):
 
-[INSTRUCCIÓN CRÍTICA: Escribe la lista de tendencias usando saltos de línea reales.]
 {txt_trends}
 
 ---
 AB
 """
 
-# --- 6. GENERACIÓN, LIMPIEZA Y CORRECCIONES ---
+# --- 6. GENERACIÓN Y LIMPIEZA ---
 try:
     model = genai.GenerativeModel('gemini-2.5-flash')
     response = model.generate_content(prompt)
     
     texto_final = response.text
     
-    # --- CORRECCIÓN 1: LISTA DE JUGADORES (Tu arreglo original) ---
+    # 1. SEGURIDAD: Forzar saltos de línea en listas si Gemini los ha quitado
     texto_final = texto_final.replace(". -", ".\n\n-").replace(": -", ":\n\n-")
 
-    # --- CORRECCIÓN 2: RENGLONES TRAS TÍTULOS (Forzado bruto) ---
-    # Busca títulos en negrita y asegura doble salto de línea
-    texto_final = texto_final.replace("**\n", "**\n\n") 
-    # Por si acaso Gemini no puso salto, busca el cierre de negrita y fuerza salto
+    # 2. SEGURIDAD: Forzar saltos tras títulos en negrita
     texto_final = re.sub(r"(\*\*[^\n]+\*\* )", r"\1\n\n", texto_final)
 
-    # --- CORRECCIÓN 3: NOMBRES DE EQUIPOS (Regex Inteligente) ---
-    # Mapa de siglas ACB 2024-2025
+    # 3. REEMPLAZO INTELIGENTE DE SIGLAS (Diccionario actualizado con MBA)
     team_map = {
         'UNI': 'Unicaja', 'RMB': 'Real Madrid', 'FCB': 'Barça',
         'VBC': 'Valencia Basket', 'TFU': 'Lenovo Tenerife', 'UCM': 'UCAM Murcia',
         'GCB': 'Dreamland Gran Canaria', 'JOV': 'Joventut', 'BKN': 'Baskonia',
         'MAN': 'BAXI Manresa', 'ZAR': 'Casademont Zaragoza', 'BIL': 'Surne Bilbao',
         'GIR': 'Bàsquet Girona', 'BRE': 'Río Breogán', 'GRA': 'Covirán Granada',
-        'AND': 'MoraBanc Andorra', 'LLE': 'Hiopos Lleida', 'COR': 'Leyma Coruña'
+        'AND': 'MoraBanc Andorra', 'MBA': 'MoraBanc Andorra', # <--- AÑADIDO
+        'LLE': 'Hiopos Lleida', 'COR': 'Leyma Coruña'
     }
 
     def replace_acronym(match):
         return team_map.get(match.group(1), match.group(1))
 
-    # Busca siglas QUE NO tengan un paréntesis antes '(' NI después ')'
-    # Así cambia "UNI" por "Unicaja", pero "Perry (UNI)" lo deja quieto.
+    # Reemplaza siglas SOLO si NO están entre paréntesis
     pattern = r"(?<!\()(" + "|".join(team_map.keys()) + r")(?!\))"
     texto_final = re.sub(pattern, replace_acronym, texto_final)
     
