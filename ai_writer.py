@@ -2,7 +2,6 @@ import pandas as pd
 import os
 import google.generativeai as genai
 import sys
-import re
 
 # --- CONFIGURACIÓN ---
 def guardar_salida(mensaje, nombre_archivo="newsletter_borrador.md"):
@@ -49,57 +48,60 @@ team_stats['ORTG'] = (team_stats['PTS'] / team_stats['Game_Poss']) * 100
 best_offense = team_stats.sort_values('ORTG', ascending=False).iloc[0]
 txt_teams = f"Mejor Ataque: {best_offense['Team']} ({best_offense['ORTG']:.1f} pts/100 poss)."
 
-# --- 4. TENDENCIAS (ARREGLADO: SIN BLOQUEOS) ---
+# --- 4. TENDENCIAS (CON ASISTENCIAS) ---
 jornadas = df['Week'].unique()
+txt_trends = "Datos insuficientes para tendencias."
 
-# Cogemos lo que haya, sin exigir mínimo de 3
-last_3 = jornadas[-3:]
-df_last = df[df['Week'].isin(last_3)]
+# CAMBIO SEGURIDAD: >= 1 para que NUNCA desaparezca la lista
+if len(jornadas) >= 1:
+    last_3 = jornadas[-3:]
+    df_last = df[df['Week'].isin(last_3)]
+    
+    # CAMBIO: Añadimos 'AST' al cálculo
+    cols_calc = ['VAL', 'PTS', 'Reb_T', 'AST']
+    means = df_last.groupby(['Name', 'Team'])[cols_calc].mean().reset_index()
+    
+    hot = means.sort_values('VAL', ascending=False).head(5)
+    txt_trends = ""
+    for _, row in hot.iterrows():
+        # CAMBIO: Añadimos las asistencias a la línea
+        txt_trends += f"- {row['Name']} ({row['Team']}): {row['VAL']:.1f} VAL, {row['PTS']:.1f} PTS, {row['Reb_T']:.1f} REB, {row['AST']:.1f} AST.\n"
 
-# Columnas (incluyendo AST si existe)
-cols_calc = ['VAL', 'PTS', 'Reb_T']
-if 'AST' in df.columns: cols_calc.append('AST')
-
-means = df_last.groupby(['Name', 'Team'])[cols_calc].mean().reset_index()
-hot = means.sort_values('VAL', ascending=False).head(5)
-
-txt_trends = ""
-for _, row in hot.iterrows():
-    linea = f"- {row['Name']} ({row['Team']}): {row['VAL']:.1f} VAL, {row['PTS']:.1f} PTS, {row['Reb_T']:.1f} REB"
-    if 'AST' in df.columns: linea += f", {row['AST']:.1f} AST"
-    linea += ".\n"
-
-# --- 5. PROMPT ---
+# --- 5. PROMPT MEJORADO ---
 prompt = f"""
-Actúa como Data Scientist senior de "Analyzing Basketball". Escribe un informe técnico y sobrio de la {ultima_jornada_label}.
+Actúa como Data Scientist de "Analyzing Basketball". Escribe un informe técnico de la {ultima_jornada_label}.
 
-DATOS INPUT:
+DATOS:
 MVP: {txt_mvp}
 TOP: {txt_rest}
 EQUIPO: {txt_teams}
 TENDENCIAS:
 {txt_trends}
 
-ESTRUCTURA OBLIGATORIA (Usa DOBLES saltos de línea para separar párrafos):
+REGLAS DE ESTILO:
+1. "VALORACIÓN": En los párrafos narrativos, escribe SIEMPRE la palabra completa "valoración" en lugar de "VAL". En las listas de estadísticas mantén "VAL".
+2. FORMATO: Usa saltos de línea claros después de los títulos.
+
+ESTRUCTURA OBLIGATORIA (Respeta los dobles saltos de línea):
 **INFORME TÉCNICO: {ultima_jornada_label}**
 
 **1. Análisis de Impacto Individual**
 
-[Analiza al MVP en un párrafo de 3-4 líneas.]
+[Analiza al MVP en 3 líneas. Usa "valoración" si hablas de su estadística total.]
 
 **2. Cuadro de Honor**
 
-[Menciona brevemente a los otros destacados.]
+[Menciona a los destacados brevemente. Recuerda usar "valoración" en el texto.]
 
 **3. Desempeño Colectivo**
 
-[Analiza el mejor ataque.]
+[Menciona el mejor ataque]
 
 **4. Proyección Estadística (Tendencias)**
 
-A continuación, los jugadores a vigilar la próxima semana por su estado de forma (Medias últimas jornadas):
+A continuación, los jugadores a vigilar la próxima semana por su estado de forma (Medias últimas 3 jornadas):
 
-[INSTRUCCIÓN CRÍTICA: Copia la lista de tendencias TAL CUAL. Usa guiones para crear una lista vertical.]
+[INSTRUCCIÓN CRÍTICA: Escribe la lista de tendencias usando saltos de línea reales. NO lo pongas todo en un párrafo.]
 {txt_trends}
 
 ---
@@ -110,31 +112,13 @@ AB
 try:
     model = genai.GenerativeModel('gemini-2.5-flash')
     response = model.generate_content(prompt)
-    texto_final = response.text
-
-    # --- REEMPLAZO DE SIGLAS (LÓGICA MEJORADA) ---
-    team_map = {
-        'UNI': 'Unicaja', 'RMB': 'Real Madrid', 'FCB': 'Barça',
-        'VBC': 'Valencia Basket', 'TFU': 'Lenovo Tenerife', 'UCM': 'UCAM Murcia',
-        'GCB': 'Dreamland Gran Canaria', 'JOV': 'Joventut Badalona', 'BKN': 'Baskonia',
-        'MAN': 'BAXI Manresa', 'ZAR': 'Casademont Zaragoza', 'BIL': 'Surne Bilbao Basket',
-        'GIR': 'Bàsquet Girona', 'BRE': 'Río Breogán', 'OBR': 'Monbus Obradoiro',
-        'GRA': 'Covirán Granada', 'PAL': 'Zunder Palencia', 'AND': 'MoraBanc Andorra',
-        'LLE': 'Hiopos Lleida', 'COR': 'Leyma Coruña'
-    }
-
-    def replace_team_acronym(match):
-        acronym = match.group(1)
-        return team_map.get(acronym, acronym)
-
-    # Regex: Busca siglas NO precedidas por '(' y NO seguidas por ')'
-    pattern = r"(?<!\()(" + "|".join(team_map.keys()) + r")(?!\))"
-    texto_final_limpio = re.sub(pattern, replace_team_acronym, texto_final)
-
-    # Forzamos doble salto de línea antes de los guiones para asegurar la lista
-    texto_final_limpio = texto_final_limpio.replace(". -", ".\n\n-").replace(": -", ":\n\n-")
     
-    guardar_salida(texto_final_limpio)
+    texto_final = response.text
+    
+    # TRUCO FINAL: Aseguramos que la lista se vea bien separada
+    texto_final = texto_final.replace(". -", ".\n\n-").replace(": -", ":\n\n-")
+    
+    guardar_salida(texto_final)
     
 except Exception as e:
     guardar_salida(f"❌ Error Gemini: {e}")
