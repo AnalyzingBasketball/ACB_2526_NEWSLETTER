@@ -2,7 +2,6 @@ import pandas as pd
 import os
 import google.generativeai as genai
 import sys
-import re
 
 # --- CONFIGURACIÓN ---
 def guardar_salida(mensaje, nombre_archivo="newsletter_borrador.md"):
@@ -49,7 +48,7 @@ team_stats['ORTG'] = (team_stats['PTS'] / team_stats['Game_Poss']) * 100
 best_offense = team_stats.sort_values('ORTG', ascending=False).iloc[0]
 txt_teams = f"Mejor Ataque: {best_offense['Team']} ({best_offense['ORTG']:.1f} pts/100 poss)."
 
-# --- 4. TENDENCIAS (CON DOBLE SALTO DE LÍNEA FORZADO) ---
+# --- 4. TENDENCIAS (GARANTIZADO: SIN BLOQUEOS) ---
 jornadas = df['Week'].unique()
 txt_trends = "Datos insuficientes para tendencias."
 
@@ -64,41 +63,75 @@ if len(jornadas) >= 1:
     
     txt_trends = ""
     for _, row in hot.iterrows():
-        # AQUI: \n\n AL FINAL PARA QUE RESPIRE LA LISTA
+        # \n\n AL FINAL PARA QUE RESPIRE LA LISTA
         txt_trends += f"- {row['Name']} ({row['Team']}): {row['VAL']:.1f} VAL, {row['PTS']:.1f} PTS, {row['Reb_T']:.1f} REB, {row['AST']:.1f} AST.\n\n"
+
+# --- MAPA DE EQUIPOS PARA EL PROMPT ---
+# Se lo pasamos a Gemini para que sepa cómo escribir los nombres
+mapa_equipos = """
+UNI -> Unicaja
+RMB -> Real Madrid
+FCB -> Barça
+VBC -> Valencia Basket
+TFU -> Lenovo Tenerife
+UCM -> UCAM Murcia
+GCB -> Dreamland Gran Canaria
+JOV -> Joventut Badalona
+BKN -> Baskonia
+MAN -> BAXI Manresa
+ZAR -> Casademont Zaragoza
+BIL -> Surne Bilbao Basket
+GIR -> Bàsquet Girona
+BRE -> Río Breogán
+GRA -> Covirán Granada
+PAL -> Zunder Palencia
+AND -> MoraBanc Andorra
+MBA -> MoraBanc Andorra
+LLE -> Hiopos Lleida
+COR -> Leyma Coruña
+COV -> Covirán Granada
+"""
 
 # --- 5. PROMPT ---
 prompt = f"""
 Actúa como Data Scientist de "Analyzing Basketball". Escribe un informe técnico de la {ultima_jornada_label}.
 
-DATOS:
+DATOS DE ENTRADA:
 MVP: {txt_mvp}
 TOP: {txt_rest}
 EQUIPO: {txt_teams}
 TENDENCIAS:
 {txt_trends}
 
-INSTRUCCIONES DE FORMATO:
-1. Usa "valoración" en el texto narrativo. Usa "VAL" solo en las listas.
-2. IMPORTANTE: Usa saltos de línea dobles entre secciones.
+DICCIONARIO DE EQUIPOS:
+{mapa_equipos}
+
+INSTRUCCIONES CRÍTICAS DE REDACCIÓN (SÍGUELAS AL PIE DE LA LETRA):
+
+1. **JUGADORES Y EQUIPOS EN TEXTO NARRATIVO (SECCIONES 1 y 2):**
+   - JAMÁS escribas "Nombre (SIGLA)". Está PROHIBIDO usar paréntesis para el equipo en los párrafos.
+   - DEBES escribir siempre: "Nombre, del [Nombre Completo del Equipo],".
+   - Ejemplo INCORRECTO: "F. Alonso (BRE) anotó..."
+   - Ejemplo CORRECTO: "F. Alonso, del Río Breogán, anotó..."
+   - Usa el diccionario de arriba para traducir las siglas (ej: MBA -> MoraBanc Andorra).
+
+2. **VALORACIÓN:**
+   - En los párrafos narrativos escribe la palabra completa "valoración".
+   - En la lista de tendencias (Sección 4), mantén "VAL".
 
 ESTRUCTURA OBLIGATORIA:
 **INFORME TÉCNICO: {ultima_jornada_label}**
 
 **1. Análisis de Impacto Individual**
-
-[Analiza al MVP en 3 líneas]
+[Párrafo analizando al MVP siguiendo la regla de "Nombre, del Equipo,".]
 
 **2. Cuadro de Honor**
-
-[Menciona a los destacados brevemente]
+[Párrafo mencionando destacados siguiendo la regla de "Nombre, del Equipo,".]
 
 **3. Desempeño Colectivo**
-
 [Menciona el mejor ataque]
 
 **4. Proyección Estadística (Tendencias)**
-
 A continuación, los jugadores a vigilar la próxima semana por su estado de forma (Medias últimas jornadas):
 
 {txt_trends}
@@ -107,36 +140,26 @@ A continuación, los jugadores a vigilar la próxima semana por su estado de for
 AB
 """
 
-# --- 6. GENERACIÓN Y LIMPIEZA ---
+# --- 6. GENERACIÓN Y LIMPIEZA A MARTILLAZOS ---
 try:
     model = genai.GenerativeModel('gemini-2.5-flash')
     response = model.generate_content(prompt)
     
     texto_final = response.text
     
-    # 1. SEGURIDAD: Forzar saltos de línea en listas si Gemini los ha quitado
+    # 1. SEGURIDAD LISTA: Forzar saltos de línea en listas si Gemini los ha quitado
     texto_final = texto_final.replace(". -", ".\n\n-").replace(": -", ":\n\n-")
 
-    # 2. SEGURIDAD: Forzar saltos tras títulos en negrita
-    texto_final = re.sub(r"(\*\*[^\n]+\*\* )", r"\1\n\n", texto_final)
+    # 2. SEGURIDAD TÍTULOS (LO QUE PEDÍAS DE LAS BARRAS):
+    # Reemplazamos los encabezados conocidos por el encabezado + DOBLE SALTO DE LÍNEA explícito
+    texto_final = texto_final.replace("**1. Análisis de Impacto Individual**", "**1. Análisis de Impacto Individual**\n\n")
+    texto_final = texto_final.replace("**2. Cuadro de Honor**", "\n\n**2. Cuadro de Honor**\n\n")
+    texto_final = texto_final.replace("**3. Desempeño Colectivo**", "\n\n**3. Desempeño Colectivo**\n\n")
+    texto_final = texto_final.replace("**4. Proyección Estadística (Tendencias)**", "\n\n**4. Proyección Estadística (Tendencias)**\n\n")
 
-    # 3. REEMPLAZO INTELIGENTE DE SIGLAS (Diccionario actualizado con MBA)
-    team_map = {
-        'UNI': 'Unicaja', 'RMB': 'Real Madrid', 'FCB': 'Barça',
-        'VBC': 'Valencia Basket', 'TFU': 'Lenovo Tenerife', 'UCM': 'UCAM Murcia',
-        'GCB': 'Dreamland Gran Canaria', 'JOV': 'Joventut', 'BKN': 'Baskonia',
-        'MAN': 'BAXI Manresa', 'ZAR': 'Casademont Zaragoza', 'BIL': 'Surne Bilbao',
-        'GIR': 'Bàsquet Girona', 'BRE': 'Río Breogán', 'GRA': 'Covirán Granada',
-        'AND': 'MoraBanc Andorra', 'MBA': 'MoraBanc Andorra', # <--- AÑADIDO
-        'LLE': 'Hiopos Lleida', 'COR': 'Leyma Coruña'
-    }
-
-    def replace_acronym(match):
-        return team_map.get(match.group(1), match.group(1))
-
-    # Reemplaza siglas SOLO si NO están entre paréntesis
-    pattern = r"(?<!\()(" + "|".join(team_map.keys()) + r")(?!\))"
-    texto_final = re.sub(pattern, replace_acronym, texto_final)
+    # 3. SEGURIDAD FINAL EQUIPOS (Por si Gemini falla):
+    # Si queda algún "MBA" suelto (sin paréntesis), lo cambiamos a mano
+    texto_final = texto_final.replace(" MBA ", " MoraBanc Andorra ").replace(" UNI ", " Unicaja ")
     
     guardar_salida(texto_final)
     
