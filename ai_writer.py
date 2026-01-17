@@ -48,15 +48,16 @@ team_stats['ORTG'] = (team_stats['PTS'] / team_stats['Game_Poss']) * 100
 best_offense = team_stats.sort_values('ORTG', ascending=False).iloc[0]
 txt_teams = f"Mejor Ataque: {best_offense['Team']} ({best_offense['ORTG']:.1f} pts/100 poss)."
 
-# --- 4. TENDENCIAS (SIN RESTRICCIONES) ---
+# --- 4. TENDENCIAS (SIN BLOQUEOS) ---
+# Cogemos todas las jornadas que haya, máximo 3
 jornadas = df['Week'].unique()
-
-# Cogemos hasta las últimas 3 que existan (si solo hay 1, coge 1)
 last_3 = jornadas[-3:]
 df_last = df[df['Week'].isin(last_3)]
 
-# Definimos columnas exactas (He verificado que tu CSV tiene 'AST')
-cols_calc = ['VAL', 'PTS', 'Reb_T', 'AST']
+# Definimos las columnas (ya verificado que tienes 'AST')
+cols_calc = ['VAL', 'PTS', 'Reb_T']
+if 'AST' in df.columns:
+    cols_calc.append('AST')
 
 # Calculamos medias
 means = df_last.groupby(['Name', 'Team'])[cols_calc].mean().reset_index()
@@ -64,8 +65,10 @@ hot = means.sort_values('VAL', ascending=False).head(5)
 
 txt_trends = ""
 for _, row in hot.iterrows():
-    # Construimos la línea limpia con AST
-    txt_trends += f"- {row['Name']} ({row['Team']}): {row['VAL']:.1f} VAL, {row['PTS']:.1f} PTS, {row['Reb_T']:.1f} REB, {row['AST']:.1f} AST.\n"
+    linea = f"- {row['Name']} ({row['Team']}): {row['VAL']:.1f} VAL, {row['PTS']:.1f} PTS, {row['Reb_T']:.1f} REB"
+    if 'AST' in df.columns:
+        linea += f", {row['AST']:.1f} AST"
+    linea += ".\n"
 
 # --- 5. PROMPT ---
 prompt = f"""
@@ -93,7 +96,7 @@ ESTRUCTURA OBLIGATORIA (Usa saltos de línea para las listas):
 **4. Proyección Estadística (Tendencias)**
 A continuación, los jugadores a vigilar la próxima semana por su estado de forma (Medias últimas jornadas):
 
-[INSTRUCCIÓN CRÍTICA: Copia la lista de tendencias TAL CUAL. Usa guiones para crear una lista vertical. NO añadas texto repetitivo como 'Media ult. 3 partidos'. Solo los datos.]
+[INSTRUCCIÓN CRÍTICA: Copia la lista de tendencias TAL CUAL. Usa guiones para crear una lista vertical. NO añadas texto extra como 'Media ult. 3 partidos'. Solo los datos.]
 {txt_trends}
 
 ---
@@ -106,7 +109,7 @@ try:
     response = model.generate_content(prompt)
     
     texto_final = response.text
-    # Forzamos visualmente la separación de la lista
+    # Forzamos separación visual
     texto_final = texto_final.replace(". -", ".\n\n-").replace(": -", ":\n\n-")
     
     guardar_salida(texto_final)
