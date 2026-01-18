@@ -8,12 +8,12 @@ import sys
 # ==============================================================================
 # 1. CONFIGURACIÓN HEADLESS
 # ==============================================================================
-# Configuración fija para la automatización
 TEMPORADA = '2025'  # 2025/2026
 COMPETICION = '1'   # Liga Endesa
 NOMBRE_ARCHIVO = f"BoxScore_ACB_{TEMPORADA}_Cumulative.csv"
-CARPETA_SALIDA = "data"  # Carpeta relativa para GitHub
+CARPETA_SALIDA = "data"
 
+# API Key pública que usa el frontend de ACB (puede cambiar con el tiempo)
 API_KEY = '0dd94928-6f57-4c08-a3bd-b1b2f092976e'
 HEADERS_API = {
     'x-apikey': API_KEY,
@@ -35,7 +35,7 @@ MAPPING_ACB = {
 }
 
 # ==============================================================================
-# 2. FUNCIONES DE AYUDA (Mantenidas igual)
+# 2. FUNCIONES DE AYUDA
 # ==============================================================================
 
 def safe_div(x, y): return x / y if y != 0 else 0.0
@@ -76,14 +76,13 @@ def get_codigo_inteligente(nombre_api):
 # ==============================================================================
 
 def get_game_ids(temp_id, comp_id, jornada_id):
-    """Extrae IDs. Si devuelve lista vacía, asumimos que la jornada no existe o no se ha jugado."""
+    """Extrae IDs de la web de resultados."""
     url = f"https://www.acb.com/resultados-clasificacion/ver/temporada_id/{temp_id}/competicion_id/{comp_id}/jornada_numero/{jornada_id}"
     ids = []
     try:
         r = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10)
         soup = BeautifulSoup(r.content, 'html.parser')
         
-        # Buscar enlaces a estadísticas
         for a in soup.find_all('a', href=True):
             if "/partido/estadisticas/id/" in a['href']:
                 try:
@@ -96,6 +95,7 @@ def get_game_ids(temp_id, comp_id, jornada_id):
         return []
 
 def get_team_totals(team_data):
+    """Calcula totales del equipo, incluyendo minutos reales."""
     t = {'PTS':0, 'FGA':0, 'FGM':0, 'FTA':0, 'ORB':0, 'DRB':0, 'TRB':0, 'TOV':0, 'MIN':200.0, 'T2A': 0, 'T3A': 0} 
     src = team_data.get('totalStats')
     if src:
@@ -109,9 +109,12 @@ def get_team_totals(team_data):
     
     if team_data.get('statsByPeriods'):
         players = team_data['statsByPeriods'][0].get('stats', {}).get('players', [])
+        # Sumamos todos los minutos jugados por los jugadores
         min_sum = sum([str_time_to_float(p.get('playTime', '00:00')) for p in players])
+        # Dividimos por 5 para obtener la duración real del partido (aprox 40.0)
         t['MIN'] = min_sum / 5.0
-        if not src:
+        
+        if not src: # Fallback si totalStats viene vacío
             for p in players:
                 t['PTS'] += p.get('points', 0)
                 t['T2A'] += p.get('twoPointersAttempted', 0); t['T3A'] += p.get('threePointersAttempted', 0)
@@ -140,10 +143,17 @@ def get_stats_api(game_id, season_lbl, week_lbl):
 
         tot_loc = get_team_totals(d_loc); tot_vis = get_team_totals(d_vis)
         
+        # --- CÁLCULO DE POSESIONES ---
         def calc_poss(tm, opp): return tm['FGA'] + 0.44*tm['FTA'] - tm['ORB'] + tm['TOV']
         poss_loc = calc_poss(tot_loc, tot_vis); poss_vis = calc_poss(tot_vis, tot_loc)
         game_poss = (poss_loc + poss_vis) / 2
-        tm_minutes = max(tot_loc['MIN'], tot_vis['MIN'], 200.0)
+        
+        # --- CORRECCIÓN CRÍTICA AQUI ---
+        # Antes: tm_minutes = max(tot_loc['MIN'], tot_vis['MIN'], 200.0)
+        # Ahora: Quitamos el 200.0 para que use la duración real (aprox 40.0)
+        tm_minutes = max(tot_loc['MIN'], tot_vis['MIN'])
+        if tm_minutes == 0: tm_minutes = 40.0 # Fallback de seguridad
+        # -------------------------------
 
         p1 = tot_loc['PTS']; p2 = tot_vis['PTS']
         winner_code = "EMPATE"
@@ -186,12 +196,16 @@ def get_stats_api(game_id, season_lbl, week_lbl):
                 fga = t2a + t3a; fgm = t2m + t3m
                 player_poss_used = fga + 0.44 * fta + tov
                 
+                # Stats porcentuales
                 sh_2p_pct = safe_div(t2a * tm_minutes, mp * tm_stats['T2A']) * 100
                 sh_3p_pct = safe_div(t3a * tm_minutes, mp * tm_stats['T3A']) * 100
                 sh_fg_pct = safe_div(fga * tm_minutes, mp * tm_stats['FGA']) * 100
                 
                 team_poss_calc = tm_stats['FGA'] + 0.44 * tm_stats['FTA'] + tm_stats['TOV']
+                
+                # USG% ahora será correcto porque tm_minutes es ~40, no 200
                 usg_pct = safe_div(player_poss_used * tm_minutes, mp * team_poss_calc) * 100 if mp > 0 else 0
+                
                 pppos = safe_div(pts, player_poss_used)
                 pm_40 = safe_div(plus_minus, mp) * 40
                 
@@ -204,8 +218,10 @@ def get_stats_api(game_id, season_lbl, week_lbl):
                 drb_pct = safe_div(drb * tm_minutes, mp * (tm_stats['DRB'] + opp_stats['ORB'])) * 100
                 trb_pct = safe_div(trb * tm_minutes, mp * (tm_stats['TRB'] + opp_stats['TRB'])) * 100
                 
+                # AST% ahora será correcto
                 ast_den = ((mp / tm_minutes) * tm_stats['FGM']) - fgm
                 ast_pct = safe_div(ast, ast_den) * 100
+                
                 stl_pct = safe_div(stl * tm_minutes, mp * game_poss) * 100
                 opp_2pa = opp_stats['FGA'] - opp_stats.get('T3A', 0) 
                 if opp_2pa == 0: opp_2pa = opp_stats['FGA'] * 0.6 
@@ -258,7 +274,6 @@ def main():
     
     all_season_data = []
     jornada = 1
-    sin_datos_consecutivos = 0
     
     # Creamos carpeta si no existe
     if not os.path.exists(CARPETA_SALIDA):
@@ -281,7 +296,6 @@ def main():
         # 3. Descargar Stats
         jornada_data = []
         for gid in ids:
-            # Ponemos 'Jornada X' como etiqueta
             lbl_jornada = f"Jornada {jornada}"
             stats = get_stats_api(gid, TEMPORADA, lbl_jornada)
             
@@ -290,7 +304,6 @@ def main():
             else:
                 print(f"   ⚠️ Partido {gid} sin estadísticas (¿No jugado?).")
             
-            # Pausa ética para no saturar
             time.sleep(0.1)
             
         if jornada_data:
@@ -308,7 +321,6 @@ def main():
         print("\n💾 Generando archivo maestro...")
         df = pd.DataFrame(all_season_data)
         
-        # Orden de columnas preferido
         cols = ['GameID', 'Season', 'Week', 'Team', 'Location', 'Winner', 'Win', 
                 'Dorsal', 'PlayerID', 'Name', 'Min', 'Seconds', 'Game_Poss', 
                 'PTS', 'VAL', 
@@ -319,7 +331,6 @@ def main():
                 'PPM', 'PP2P', 'PP3P', 'PPFG', 'PPPOS',
                 'Sh%_2P', 'Sh%_3P', 'Sh%_FG'] 
         
-        # Filtrar solo columnas existentes para evitar KeyErrors
         cols_final = [c for c in cols if c in df.columns]
         df = df[cols_final]
         
