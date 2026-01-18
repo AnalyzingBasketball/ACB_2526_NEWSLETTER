@@ -8,7 +8,7 @@ import numpy as np
 # ==============================================================================
 # 1. CONFIGURACIÓN
 # ==============================================================================
-MODEL_NAME = "gemini-2.5-flash" 
+MODEL_NAME = "gemini-2.5-flash"
 FILE_PATH = "data/BoxScore_ACB_2025_Cumulative.csv"
 
 # Diccionario de Equipos
@@ -53,7 +53,6 @@ def extraer_numero_jornada(texto):
 # ==============================================================================
 api_key = os.environ.get("GEMINI_API_KEY")
 if not api_key: guardar_salida("❌ Error: Falta GEMINI_API_KEY.")
-
 genai.configure(api_key=api_key)
 
 if not os.path.exists(FILE_PATH): guardar_salida("❌ No hay CSV.")
@@ -68,18 +67,18 @@ jornadas_unicas = sorted(df['Week'].unique(), key=extraer_numero_jornada)
 ultima_jornada_label = jornadas_unicas[-1]
 df_week = df[df['Week'] == ultima_jornada_label]
 
-print(f"🤖 Analizando {ultima_jornada_label}...")
+print(f"🤖 Analizando {ultima_jornada_label} (Temporada 2025/2026)...")
 
 # ==============================================================================
 # 4. PREPARACIÓN DE DATOS
 # ==============================================================================
+
 # A. MVP
 ganadores = df_week[df_week['Win'] == 1]
 pool = ganadores if not ganadores.empty else df_week
 mvp = pool.sort_values('VAL', ascending=False).iloc[0]
-
 txt_mvp = (f"{mvp['Name']} ({get_team_name(mvp['Team'])}): {b(mvp['VAL'])} VAL, "
-           f"{b(mvp['PTS'])} PTS (TS%: {b(mvp['TS%'], 1, True)}), {b(mvp['Reb_T'])} REB.")
+           f"{b(mvp['PTS'])} PTS, {b(mvp['Reb_T'])} REB.")
 
 # B. DESTACADOS
 resto = df_week[df_week['PlayerID'] != mvp['PlayerID']]
@@ -126,11 +125,11 @@ if len(jornadas_unicas) >= 1:
                        f"{b(row['VAL'], 1)} VAL, {b(row['PTS'], 1)} PTS.\n")
 
 # ==============================================================================
-# 5. GENERACIÓN IA CON BÚSQUEDA "PARANOICA"
+# 5. GENERACIÓN IA CON FACT-CHECKING (TEMPORADA 2025/2026)
 # ==============================================================================
 
 prompt = f"""
-Eres el redactor jefe de la Liga Endesa. Tu máxima prioridad es la PRECISIÓN EN LOS NOMBRES.
+Actúa como un Verificador de Datos (Fact-Checker) y Periodista Deportivo experto en la Liga Endesa (ACB), Temporada 2025/2026.
 
 DATOS A PROCESAR:
 MVP: {txt_mvp}
@@ -143,43 +142,43 @@ CONTEXTO:
 TENDENCIAS:
 {txt_trends}
 
-INSTRUCCIONES DE VERIFICACIÓN ESTRICTA (GOOGLE SEARCH):
-Para CADA jugador mencionado en los datos (ej: "D. Brankovic", "M. Normantas", "F. Alonso"), DEBES realizar el siguiente proceso OBLIGATORIO antes de escribir su nombre:
+INSTRUCCIONES CRÍTICAS DE BÚSQUEDA Y REDACCIÓN:
+Para CADA jugador mencionado arriba, realiza los siguientes pasos ANTES de escribir nada:
 
-1. 🔍 **BUSCA EN GOOGLE**: Escribe internamente la query: `[Nombre Abreviado] [Equipo] ACB plantilla`.
-2. 👁️ **LEE EL RESULTADO**: Busca la ficha oficial o noticias recientes.
-3. ❌ **CORRIGE EL SESGO**:
-   - Si ves "M. Normantas", NO ASUMAS "Martynas". Busca y verás que en Bilbao Basket juega **Margiris Normantas**.
-   - Si ves "D. Brankovic", NO ASUMAS "Dusan". Busca y verás que en Bayern/ACB juega **Danko Brankovic**.
-   - Si ves "F. Alonso", confirma que es **Francis Alonso**.
-4. ✅ **ESCRIBE EL NOMBRE VERIFICADO**.
+1. **CONTEXTO TEMPORAL**: Estamos en la temporada **2025-2026**.
+2. **BUSCA EN GOOGLE**: Usa la query precisa: `"Plantilla [Equipo] ACB 2025-2026"`.
+   - Ejemplo: Si ves "F. Alonso (Río Breogán)", busca "Plantilla Río Breogán 2025-2026".
+3. **VERIFICA**:
+   - Confirma que el nombre es **Francis Alonso**, NO Fernando Alonso.
+   - Confirma que **D. Brankovic** en Breogán es **Danko Brankovic** (si sigue en el equipo) o comprueba fichajes recientes.
+   - Confirma nombres balcánicos/lituanos (ej: M. Normantas -> Margiris).
+4. **CORRIGE**: Usa el nombre completo verificado.
+5. **REDACCIÓN**: Escribe una crónica periodística densa en datos, evitando frases vacías.
 
-ESTRUCTURA DEL EMAIL:
-## 🏀 Crónica ACB: {ultima_jornada_label}
+ESTRUCTURA DE SALIDA:
+## 🏀 Informe ACB: {ultima_jornada_label}
 
 ### 👑 El MVP
-[Nombre Completo VERIFICADO + Apellido]
+[Nombre completo verificado y análisis]
 
 ### 🚀 Radar de Eficiencia
-[Nombres Completos VERIFICADOS]
+[Nombres completos verificados y análisis]
 
 ### 🧠 Pizarra Táctica
 [Equipos]
 
-### 🔥 Tendencias
+### 🔥 Tendencias (Últimas Jornadas)
 {txt_trends}
 """
 
 try:
-    print("🚀 Generando crónica (Modo Verificación Estricta activado)...")
+    print("🚀 Generando crónica (Verificando plantillas 2025/2026 en Google)...")
     
-    # Herramienta de búsqueda activada
+    # Activamos Google Search
     tools_config = [ {"google_search": {}} ]
     
     model = genai.GenerativeModel(MODEL_NAME, tools=tools_config)
     
-    # Aumentamos la temperatura ligeramente para fomentar que use la herramienta creativa de búsqueda
-    # pero mantenemos el control con el prompt estricto.
     response = model.generate_content(prompt)
     
     texto = response.text
