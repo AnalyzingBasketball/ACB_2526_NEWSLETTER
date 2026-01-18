@@ -6,9 +6,13 @@ import markdown
 import sys
 import pandas as pd
 import requests
+import urllib.parse  # <--- NUEVO: Para limpiar el email en la URL
 
 # --- 1. CONFIGURACIÓN ---
 URL_LOGO = "https://raw.githubusercontent.com/AnalyzingBasketball/acb-newsletter-bot/refs/heads/main/logo.png"
+
+# 🔴 PEGA AQUÍ LA URL DE TU FORMULARIO TALLY (El que creaste con el campo hidden 'email')
+URL_TALLY_BAJA = "https://tally.so/r/TU_CODIGO_AQUI" 
 
 gmail_user = os.environ.get("GMAIL_USER")
 gmail_password = os.environ.get("GMAIL_PASSWORD")
@@ -26,11 +30,9 @@ if not os.path.exists(ARCHIVO_MD):
     sys.exit(1)
 
 with open(ARCHIVO_MD, "r", encoding="utf-8") as f:
-    # Leemos líneas y quitamos las vacías al inicio para encontrar el título real
     lines = [line.strip() for line in f.readlines() if line.strip()]
-    md_content = "\n".join(lines) # Reconstruimos el contenido limpio
+    md_content = "\n".join(lines)
 
-# Extraemos título (primera línea no vacía, quitando #)
 titulo_clean = lines[0].replace('#', '').strip() if lines else "Informe ACB"
 
 # --- 3. PUBLICAR EN LINKEDIN (vía Make) ---
@@ -48,12 +50,12 @@ Lee el informe completo y suscríbete aquí: https://analyzingbasketball.wixsite
     except Exception as e:
         print(f"⚠️ Error LinkedIn: {e}")
 
-# --- 4. PREPARAR EMAIL ---
+# --- 4. PREPARAR CAMPAÑA ---
 print("📥 Preparando campaña de Email...")
 html_body = markdown.markdown(md_content)
 
-# Estilos CSS Inline mejorados para compatibilidad
-plantilla_html = f"""
+# NOTA: En la plantilla ponemos un marcador {LINK_BAJA_PERSONALIZADO} que sustituiremos luego
+plantilla_html_base = f"""
 <!DOCTYPE html>
 <html>
 <head>
@@ -81,7 +83,12 @@ plantilla_html = f"""
         <div style='background-color: #f9f9f9; padding: 30px; text-align: center; border-top: 1px solid #eeeeee;'>
             <a href='https://analyzingbasketball.wixsite.com/home' style='color: #000000; font-weight: bold; text-decoration: none; font-size: 14px; text-transform: uppercase;'>Analyzing Basketball</a>
             <p style='color: #999999; font-size: 11px; margin-top: 10px;'>&copy; 2026 AB</p>
-            <p style='color: #cccccc; font-size: 10px;'>Si no deseas recibir estos correos, responde con BAJA.</p>
+            
+            <p style='margin-top: 20px;'>
+                <a href="LINK_BAJA_PLACEHOLDER" style='color: #cccccc; font-size: 10px; text-decoration: underline;'>
+                    Darse de baja de la lista
+                </a>
+            </p>
         </div>
 
     </div>
@@ -91,30 +98,22 @@ plantilla_html = f"""
 
 # --- 5. GESTIÓN DE SUSCRIPTORES ---
 lista_emails = []
-
-# Añadir siempre al admin para verificar
-if gmail_user:
-    lista_emails.append(gmail_user)
+if gmail_user: lista_emails.append(gmail_user)
 
 if url_suscriptores:
     try:
         print("🔍 Descargando lista de suscriptores...")
         df_subs = pd.read_csv(url_suscriptores, on_bad_lines='skip', engine='python')
         
-        # Lógica mejorada para encontrar la columna de emails
         col_email = None
-        
-        # 1. Buscar por nombre de columna
         possible_names = ['email', 'correo', 'e-mail', 'mail']
         for col in df_subs.columns:
             if str(col).lower() in possible_names:
                 col_email = col
                 break
         
-        # 2. Si falla, buscar contenido con @
         if not col_email:
             for col in df_subs.columns:
-                # Miramos los primeros 5 valores para ver si hay arrobas
                 sample = df_subs[col].dropna().head(5).astype(str)
                 if any("@" in x for x in sample):
                     col_email = col
@@ -122,10 +121,8 @@ if url_suscriptores:
         
         if col_email:
             nuevos_emails = df_subs[col_email].dropna().unique().tolist()
-            # Limpieza básica de espacios
             nuevos_emails = [e.strip() for e in nuevos_emails if "@" in str(e)]
             
-            # Evitar duplicados con el admin
             for e in nuevos_emails:
                 if e not in lista_emails:
                     lista_emails.append(e)
@@ -148,16 +145,26 @@ try:
 
     for email in lista_emails:
         try:
+            # --- AQUÍ ESTÁ LA MAGIA DE TALLY ---
+            # 1. Codificamos el email (ej: pepe+1@gmail.com -> pepe%2B1%40gmail.com) para que la URL sea válida
+            email_seguro = urllib.parse.quote(email)
+            
+            # 2. Creamos el link completo
+            link_baja = f"{URL_TALLY_BAJA}?email={email_seguro}"
+            
+            # 3. Reemplazamos el marcador en el HTML solo para este usuario
+            html_final = plantilla_html_base.replace("LINK_BAJA_PLACEHOLDER", link_baja)
+            # -----------------------------------
+
             msg = MIMEMultipart()
             msg['From'] = f"Analyzing Basketball <{gmail_user}>"
             msg['To'] = email
             msg['Subject'] = f"🏀 Informe: {titulo_clean}"
-            msg.attach(MIMEText(plantilla_html, 'html'))
+            msg.attach(MIMEText(html_final, 'html'))
             
             server.sendmail(gmail_user, email, msg.as_string())
             enviados += 1
-            # Pequeña pausa para no saturar SMTP si la lista es grande
-            # time.sleep(0.5) 
+            
         except Exception as e:
             print(f"❌ Error enviando a {email}: {e}")
             errores += 1
