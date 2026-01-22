@@ -1,75 +1,43 @@
-name: Generar Newsletter ACB Auto
+name: Check Status ACB
 
 on:
   schedule:
-    # Domingos cada hora de 12:00 a 23:00 UTC
-    - cron: '30 12-23 * * 0'
-  workflow_dispatch:
+    - cron: '0 * * * *' # Ejecutar cada hora en punto
+  workflow_dispatch: # Permite ejecutar manual
 
 permissions:
   contents: write
 
 jobs:
-  verificar-y-enviar:
+  check-and-process:
     runs-on: ubuntu-latest
     
     steps:
-    - name: 📥 Descargar código
-      uses: actions/checkout@v4
+    - name: Checkout repo
+      uses: actions/checkout@v3
 
-    - name: 🐍 Configurar Python
+    - name: Setup Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
 
-    - name: 📦 Instalar librerías
-      run: pip install -r requirements.txt
+    - name: Install dependencies
+      run: |
+        pip install requests beautifulsoup4
 
-    # --- PASO 1: EL CHECK (Lee el log.txt) ---
-    - name: 🕵️‍♀️ Verificar Estado Jornada
-      id: check
+    - name: Run script
+      env:
+        # Si tu funcion enviar_newsletter necesita contraseñas, ponlas aquí
+        EMAIL_USER: ${{ secrets.EMAIL_USER }} 
+        EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
       run: python check_status.py
-    # -----------------------------------------
 
-    - name: 📊 2. Ejecutar Scraper (Datos)
-      if: steps.check.outputs.SHOULD_RUN == 'true' || github.event_name == 'workflow_dispatch'
-      run: python boxscore_ACB_headless.py
-
-    - name: 🧠 3. Ejecutar Redactor IA (Gemini)
-      if: steps.check.outputs.SHOULD_RUN == 'true' || github.event_name == 'workflow_dispatch'
-      env:
-        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      run: python ai_writer.py
-
-    - name: 🚀 4. Enviar Email y Redes
-      if: steps.check.outputs.SHOULD_RUN == 'true' || github.event_name == 'workflow_dispatch'
-      env:
-        GMAIL_USER: ${{ secrets.GMAIL_USER }}
-        GMAIL_PASSWORD: ${{ secrets.GMAIL_PASSWORD }}
-        URL_SUSCRIPTORES: ${{ secrets.URL_SUSCRIPTORES }}
-        MAKE_WEBHOOK_URL: ${{ secrets.MAKE_WEBHOOK_URL }}
-      run: python email_sender.py
-
-    # --- PASO 5: ACTUALIZAR EL LOG Y SUBIR ---
-    - name: 💾 Actualizar LOG y Guardar
-      if: steps.check.outputs.SHOULD_RUN == 'true'
+    - name: Commit & Push changes
       run: |
         git config --global user.name 'ACB Bot'
         git config --global user.email 'bot@noreply.github.com'
-        
-        # 1. Asegurar que la carpeta data existe
-        mkdir -p data
-        
-        # 2. Escribir en el LOG (Append >>)
-        # Formato: FECHA - HORA : Texto
-        echo "$(date "+%Y-%m-%d %H:%M") : ✅ Jornada ${{ steps.check.outputs.TARGET_JORNADA }} completada y enviada." >> data/log.txt
-        
-        # 3. Mostrar el log en la consola para depurar (opcional)
-        cat data/log.txt
-        
-        # 4. Añadir cambios a Git
-        git add data/
-        
-        # 5. Commit y Push
-        git commit -m "Auto: Update log post-envío Jornada ${{ steps.check.outputs.TARGET_JORNADA }}" || echo "Sin cambios"
+        # Añadimos LOG y el archivo de BUFFER (importante para la cuenta atrás)
+        git add data/log.txt data/buffer_control.txt
+        # Commit solo si hay cambios, si no, no falla
+        git commit -m "Auto: Update status J${{ github.run_number }}" || exit 0
         git push
