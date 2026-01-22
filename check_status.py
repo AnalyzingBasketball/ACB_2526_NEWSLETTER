@@ -2,6 +2,7 @@ import requests
 import os
 import re
 import datetime
+import subprocess # <--- NUEVO: Para ejecutar tus otros scripts
 from bs4 import BeautifulSoup
 
 # ==============================================================================
@@ -9,9 +10,9 @@ from bs4 import BeautifulSoup
 # ==============================================================================
 TEMPORADA = '2025'
 COMPETICION = '1'
-HORAS_BUFFER = 10
+HORAS_BUFFER = 10 # Has puesto 10 horas. Si quieres 4, cámbialo aquí.
 LOG_FILE = "data/log.txt"
-BUFFER_FILE = "data/buffer_control.txt" # Archivo temporal para contar las horas
+BUFFER_FILE = "data/buffer_control.txt"
 
 # API Key y Headers
 API_KEY = '0dd94928-6f57-4c08-a3bd-b1b2f092976e'
@@ -23,7 +24,7 @@ HEADERS_API = {
 }
 
 # ==============================================================================
-# ZONA 1: TUS FUNCIONES DE SCRAPING (Tal cual las tenías)
+# ZONA 1: TUS FUNCIONES DE SCRAPING
 # ==============================================================================
 
 def get_last_jornada_from_log():
@@ -70,35 +71,47 @@ def is_game_finished(game_id):
     except: return False
 
 # ==============================================================================
-# ZONA 2: LÓGICA DE ENVÍO Y CONTROL DE TIEMPO
+# ZONA 2: EL PUENTE (Aquí está el cambio clave)
 # ==============================================================================
 
-def enviar_newsletter(jornada):
+def ejecutar_secuencia_completa(jornada):
     """
-    ⚠️ AQUÍ PEGA TU LÓGICA DE ENVÍO DE CORREO ⚠️
+    Ejecuta ai_writer.py y luego email_sender.py
     """
-    print(f"📧 SIMULACIÓN: Enviando newsletter de la Jornada {jornada}...")
-    
-    # ... Tu código requests.post o smtplib aquí ...
-    # if error: return False
-    
-    return True
+    print(f"🔄 Iniciando secuencia para Jornada {jornada}...")
+
+    # 1. EJECUTAR EL ESCRITOR (IA)
+    print("🤖 1. Ejecutando ai_writer.py...")
+    try:
+        # Ejecuta el script y captura si falla
+        resultado_ai = subprocess.run(["python", "ai_writer.py"], check=True, text=True, capture_output=True)
+        print(resultado_ai.stdout) # Muestra lo que diga la IA
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Error crítico en ai_writer: {e.stderr}")
+        return False
+
+    # 2. EJECUTAR EL ENVIADOR (EMAIL)
+    print("📧 2. Ejecutando email_sender.py...")
+    try:
+        resultado_email = subprocess.run(["python", "email_sender.py"], check=True, text=True, capture_output=True)
+        print(resultado_email.stdout)
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Error crítico en email_sender: {e.stderr}")
+        return False
 
 def gestionar_buffer(jornada):
-    """Maneja la espera de X horas usando un archivo de texto"""
     ahora = datetime.datetime.now()
     
-    # 1. ¿Existe archivo de espera?
     if os.path.exists(BUFFER_FILE):
         with open(BUFFER_FILE, "r") as f:
             contenido = f.read().strip().split(",")
             
-        # Si el archivo está corrupto o es de otra jornada vieja, reiniciamos
         if len(contenido) != 2 or int(contenido[0]) != jornada:
             print(f"Detectado cambio de jornada o archivo corrupto. Reiniciando buffer para J{jornada}.")
             with open(BUFFER_FILE, "w") as f:
                 f.write(f"{jornada},{ahora.timestamp()}")
-            return False # Acabamos de empezar a esperar
+            return False 
 
         timestamp_inicio = float(contenido[1])
         inicio_espera = datetime.datetime.fromtimestamp(timestamp_inicio)
@@ -108,12 +121,11 @@ def gestionar_buffer(jornada):
         print(f"⏳ Buffer activo para J{jornada}. Llevamos {horas_pasadas:.2f} / {HORAS_BUFFER} horas.")
 
         if horas_pasadas >= HORAS_BUFFER:
-            return True # ¡Tiempo cumplido!
+            return True
         else:
-            return False # Aún falta tiempo
+            return False
             
     else:
-        # 2. No existe, lo creamos ahora mismo
         print(f"🆕 Jornada terminada detectada por primera vez. Iniciando cuenta atrás de {HORAS_BUFFER}h.")
         with open(BUFFER_FILE, "w") as f:
             f.write(f"{jornada},{ahora.timestamp()}")
@@ -124,21 +136,18 @@ def gestionar_buffer(jornada):
 # ==============================================================================
 
 def main():
-    # 1. Obtener objetivo
     last_sent = get_last_jornada_from_log()
     target_jornada = last_sent + 1
     
     print(f"--- INICIO SCRIPT ---")
     print(f"Última enviada: {last_sent}. Revisando Jornada: {target_jornada}")
 
-    # 2. Buscar partidos
     game_ids = get_game_ids(TEMPORADA, COMPETICION, str(target_jornada))
     
     if not game_ids:
-        print(f"⛔ Jornada {target_jornada} sin partidos o futura (no hay IDs).")
+        print(f"⛔ Jornada {target_jornada} sin partidos o futura.")
         return
 
-    # 3. Verificar si TODOS han acabado
     finished_count = 0
     for gid in game_ids:
         if is_game_finished(gid):
@@ -146,26 +155,24 @@ def main():
     
     print(f"📊 Estado J{target_jornada}: {finished_count}/{len(game_ids)} terminados.")
 
-    # 4. Decisión Final
     if finished_count == len(game_ids) and len(game_ids) > 0:
         print("✅ Todos los partidos han terminado.")
         
-        # A) Chequeo del Buffer (esperar X horas)
         tiempo_cumplido = gestionar_buffer(target_jornada)
         
         if tiempo_cumplido:
-            print("🚀 Buffer superado. Procediendo al envío...")
-            exito = enviar_newsletter(target_jornada)
+            print("🚀 Buffer superado. Lanzando la IA y el Email...")
+            
+            # LLAMAMOS A LA NUEVA FUNCIÓN QUE EJECUTA LOS OTROS ARCHIVOS
+            exito = ejecutar_secuencia_completa(target_jornada)
             
             if exito:
-                # Actualizar LOG definitivo
                 fecha_log = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
                 linea_log = f"{fecha_log} : ✅ Jornada {target_jornada} completada y enviada.\n"
                 
                 with open(LOG_FILE, "a", encoding="utf-8") as f:
                     f.write(linea_log)
                 
-                # Borrar archivo de buffer (ya no hace falta)
                 if os.path.exists(BUFFER_FILE):
                     os.remove(BUFFER_FILE)
                     
@@ -174,8 +181,7 @@ def main():
             print("zzz Esperando buffer...")
             
     else:
-        print("⚽ Aún se está jugando. No hacemos nada.")
-        # Si existía un buffer (quizás se suspendió un partido y volvió a activo), lo borramos por seguridad
+        print("⚽ Aún se está jugando.")
         if os.path.exists(BUFFER_FILE):
              os.remove(BUFFER_FILE)
 
