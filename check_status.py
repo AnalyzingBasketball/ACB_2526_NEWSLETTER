@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 # ==============================================================================
 TEMPORADA = '2025'
 COMPETICION = '1'
-HORAS_BUFFER = 0
+HORAS_BUFFER = 12
 LOG_FILE = "data/log.txt"
 BUFFER_FILE = "data/buffer_control.txt"
 
@@ -112,12 +112,24 @@ def ejecutar_secuencia_completa(jornada):
 def gestionar_buffer(jornada):
     ahora = datetime.datetime.now()
     
+    # --- REGLA SALVAVIDAS: "LA REGLA DEL LUNES" ---
+    # Si es Lunes (0), Martes (1) o Miércoles (2) y son más de las 08:00 AM...
+    # ... SIGNIFICA QUE VAMOS TARDE. ¡ENVIAR YA!
+    if ahora.weekday() in [0, 1, 2] and ahora.hour >= 8:
+        print(f"🚨 Es lunes (o posterior) a las {ahora.hour}h. Saltando buffer para enviar YA.")
+        # Limpiamos buffer antiguo si existía para no confundir
+        if os.path.exists(BUFFER_FILE):
+            os.remove(BUFFER_FILE)
+        return True
+    # -----------------------------------------------
+
+    # Lógica estándar (para Domingos por la noche)
     if os.path.exists(BUFFER_FILE):
         with open(BUFFER_FILE, "r") as f:
             contenido = f.read().strip().split(",")
             
         if len(contenido) != 2 or int(contenido[0]) != jornada:
-            print(f"Detectado cambio de jornada o archivo corrupto. Reiniciando buffer para J{jornada}.")
+            print(f"Reinicio de buffer para J{jornada}.")
             with open(BUFFER_FILE, "w") as f:
                 f.write(f"{jornada},{ahora.timestamp()}")
             return False 
@@ -127,7 +139,7 @@ def gestionar_buffer(jornada):
         diferencia = ahora - inicio_espera
         horas_pasadas = diferencia.total_seconds() / 3600
 
-        print(f"⏳ Buffer activo para J{jornada}. Llevamos {horas_pasadas:.2f} / {HORAS_BUFFER} horas.")
+        print(f"⏳ Buffer activo. Llevamos {horas_pasadas:.2f} / {HORAS_BUFFER} horas.")
 
         if horas_pasadas >= HORAS_BUFFER:
             return True
@@ -135,7 +147,7 @@ def gestionar_buffer(jornada):
             return False
             
     else:
-        print(f"🆕 Jornada terminada detectada por primera vez. Iniciando cuenta atrás de {HORAS_BUFFER}h.")
+        print(f"🆕 Jornada terminada detectada (Domingo noche). Iniciando espera de {HORAS_BUFFER}h.")
         with open(BUFFER_FILE, "w") as f:
             f.write(f"{jornada},{ahora.timestamp()}")
         return False
