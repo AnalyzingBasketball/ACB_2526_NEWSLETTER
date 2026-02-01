@@ -24,7 +24,7 @@ HEADERS_API = {
 }
 
 # ==============================================================================
-# ZONA 1: FUNCIONES DE SCRAPING
+# ZONA 1: TUS FUNCIONES DE SCRAPING
 # ==============================================================================
 
 def get_last_jornada_from_log():
@@ -71,13 +71,13 @@ def is_game_finished(game_id):
     except: return False
 
 # ==============================================================================
-# ZONA 2: EL PUENTE (ACTUALIZAR DATOS -> ESCRIBIR -> ENVIAR)
+# ZONA 2: SECUENCIA DE ENVÍO
 # ==============================================================================
 
 def ejecutar_secuencia_completa(jornada):
     print(f"🔄 Iniciando secuencia completa para Jornada {jornada}...")
 
-    # PASO 0: SCRAPER DE DATOS
+    # PASO 0: SCRAPER
     NOMBRE_SCRIPT_DATOS = "boxscore_ACB_headless.py"
     print(f"📥 0. Ejecutando {NOMBRE_SCRIPT_DATOS}...")
     try:
@@ -87,7 +87,7 @@ def ejecutar_secuencia_completa(jornada):
         print(f"❌ Error crítico actualizando datos: {e}")
         return False
 
-    # PASO 1: IA WRITER
+    # PASO 1: IA
     print("🤖 1. Ejecutando ai_writer.py...")
     try:
         subprocess.run(["python", "ai_writer.py"], check=True, text=True)
@@ -95,7 +95,7 @@ def ejecutar_secuencia_completa(jornada):
         print(f"❌ Error crítico en ai_writer: {e}")
         return False
 
-    # PASO 2: EMAIL SENDER
+    # PASO 2: EMAIL
     print("📧 2. Ejecutando email_sender.py...")
     try:
         subprocess.run(["python", "email_sender.py"], check=True, text=True)
@@ -114,7 +114,7 @@ def gestionar_buffer(jornada):
             os.remove(BUFFER_FILE)
         return True
 
-    # Lógica estándar (Buffer de espera)
+    # Lógica estándar
     if os.path.exists(BUFFER_FILE):
         with open(BUFFER_FILE, "r") as f:
             contenido = f.read().strip().split(",")
@@ -144,29 +144,27 @@ def gestionar_buffer(jornada):
         return False
 
 # ==============================================================================
-# MAIN (BLINDADO)
+# MAIN (PROTEGIDO)
 # ==============================================================================
 
 def main():
     last_sent = get_last_jornada_from_log()
     target_jornada = last_sent + 1
     
-    print(f"--- INICIO SCRIPT CONTROL ---")
-    print(f"Última enviada: {last_sent}. Revisando: {target_jornada}")
+    print(f"--- INICIO SCRIPT DE CONTROL ---")
+    print(f"Última enviada: {last_sent}. Revisando Jornada: {target_jornada}")
 
     game_ids = get_game_ids(TEMPORADA, COMPETICION, str(target_jornada))
     
-    # --- [NUEVO] BLINDAJE ANTI-DOMINGO ---
-    # Si encuentra menos de 8 partidos, asume que la web de la ACB no muestra todo
-    # y ABORTA para no enviar newsletters incompletas.
+    # --- [PROTECCIÓN] SI NO HAY AL MENOS 8 PARTIDOS, NO ES UNA JORNADA COMPLETA ---
     if len(game_ids) < 8:
         print(f"⚠️ ALERTA: Solo he encontrado {len(game_ids)} partidos para la J{target_jornada}.")
-        print("⛔ Probablemente falten partidos por cargar en la web. ABORTANDO.")
+        print("⛔ Probablemente la web de la ACB no muestre todos aún. ABORTANDO ENVÍO.")
         return
-    # -------------------------------------
+    # ------------------------------------------------------------------------------
 
     if not game_ids:
-        print(f"⛔ Jornada {target_jornada} sin partidos.")
+        print(f"⛔ Jornada {target_jornada} sin partidos o futura.")
         return
 
     finished_count = 0
@@ -182,7 +180,7 @@ def main():
         tiempo_cumplido = gestionar_buffer(target_jornada)
         
         if tiempo_cumplido:
-            print("🚀 Buffer superado. Enviando...")
+            print("🚀 Buffer superado. Iniciando actualización y envío...")
             exito = ejecutar_secuencia_completa(target_jornada)
             
             if exito:
@@ -197,9 +195,10 @@ def main():
                 print("🏁 Éxito total.")
         else:
             print("zzz Esperando buffer...")
+            
     else:
         print("⚽ Aún se está jugando.")
-        # Limpieza preventiva por si hubo un falso positivo antes
+        # Borrado preventivo de buffer si detectamos partidos en juego
         if os.path.exists(BUFFER_FILE):
              os.remove(BUFFER_FILE)
 
