@@ -24,7 +24,7 @@ HEADERS_API = {
 }
 
 # ==============================================================================
-# ZONA 1: TUS FUNCIONES DE SCRAPING (VERIFICAR ESTADO)
+# ZONA 1: FUNCIONES DE SCRAPING
 # ==============================================================================
 
 def get_last_jornada_from_log():
@@ -77,32 +77,27 @@ def is_game_finished(game_id):
 def ejecutar_secuencia_completa(jornada):
     print(f"🔄 Iniciando secuencia completa para Jornada {jornada}...")
 
-    # --- PASO 0: ACTUALIZAR EL CSV CON TU SCRAPER ---
-    NOMBRE_SCRIPT_DATOS = "boxscore_ACB_headless.py" # <--- NOMBRE EXACTO PUESTO
-    
-    print(f"📥 0. Ejecutando {NOMBRE_SCRIPT_DATOS} para descargar estadísticas nuevas...")
+    # PASO 0: SCRAPER DE DATOS
+    NOMBRE_SCRIPT_DATOS = "boxscore_ACB_headless.py"
+    print(f"📥 0. Ejecutando {NOMBRE_SCRIPT_DATOS}...")
     try:
-        # Ejecutamos tu scraper. Como tu scraper sobrescribe el CSV Cumulative, 
-        # al terminar tendremos los datos frescos listos para la IA.
         subprocess.run(["python", NOMBRE_SCRIPT_DATOS], check=True, text=True)
         print("✅ Datos actualizados correctamente.")
     except subprocess.CalledProcessError as e:
         print(f"❌ Error crítico actualizando datos: {e}")
         return False
 
-    # --- PASO 1: EJECUTAR LA IA ---
+    # PASO 1: IA WRITER
     print("🤖 1. Ejecutando ai_writer.py...")
     try:
-        # La IA leerá el CSV que acabamos de actualizar en el paso 0
         subprocess.run(["python", "ai_writer.py"], check=True, text=True)
     except subprocess.CalledProcessError as e:
         print(f"❌ Error crítico en ai_writer: {e}")
         return False
 
-    # --- PASO 2: ENVIAR EMAIL ---
+    # PASO 2: EMAIL SENDER
     print("📧 2. Ejecutando email_sender.py...")
     try:
-        # El sender leerá el .md generado por la IA en el paso 1
         subprocess.run(["python", "email_sender.py"], check=True, text=True)
         return True
     except subprocess.CalledProcessError as e:
@@ -112,18 +107,14 @@ def ejecutar_secuencia_completa(jornada):
 def gestionar_buffer(jornada):
     ahora = datetime.datetime.now()
     
-    # --- REGLA SALVAVIDAS: "LA REGLA DEL LUNES" ---
-    # Si es Lunes (0), Martes (1) o Miércoles (2) y son más de las 08:00 AM...
-    # ... SIGNIFICA QUE VAMOS TARDE. ¡ENVIAR YA!
+    # REGLA DEL LUNES: Si es Lunes(0), Martes(1) o Miércoles(2) y > 08:00, enviar ya.
     if ahora.weekday() in [0, 1, 2] and ahora.hour >= 8:
-        print(f"🚨 Es lunes (o posterior) a las {ahora.hour}h. Saltando buffer para enviar YA.")
-        # Limpiamos buffer antiguo si existía para no confundir
+        print(f"🚨 Es lunes/martes a las {ahora.hour}h. Saltando buffer.")
         if os.path.exists(BUFFER_FILE):
             os.remove(BUFFER_FILE)
         return True
-    # -----------------------------------------------
 
-    # Lógica estándar (para Domingos por la noche)
+    # Lógica estándar (Buffer de espera)
     if os.path.exists(BUFFER_FILE):
         with open(BUFFER_FILE, "r") as f:
             contenido = f.read().strip().split(",")
@@ -147,26 +138,35 @@ def gestionar_buffer(jornada):
             return False
             
     else:
-        print(f"🆕 Jornada terminada detectada (Domingo noche). Iniciando espera de {HORAS_BUFFER}h.")
+        print(f"🆕 Fin de jornada detectado. Iniciando espera de {HORAS_BUFFER}h.")
         with open(BUFFER_FILE, "w") as f:
             f.write(f"{jornada},{ahora.timestamp()}")
         return False
 
 # ==============================================================================
-# MAIN
+# MAIN (BLINDADO)
 # ==============================================================================
 
 def main():
     last_sent = get_last_jornada_from_log()
     target_jornada = last_sent + 1
     
-    print(f"--- INICIO SCRIPT DE CONTROL ---")
-    print(f"Última enviada: {last_sent}. Revisando Jornada: {target_jornada}")
+    print(f"--- INICIO SCRIPT CONTROL ---")
+    print(f"Última enviada: {last_sent}. Revisando: {target_jornada}")
 
     game_ids = get_game_ids(TEMPORADA, COMPETICION, str(target_jornada))
     
+    # --- [NUEVO] BLINDAJE ANTI-DOMINGO ---
+    # Si encuentra menos de 8 partidos, asume que la web de la ACB no muestra todo
+    # y ABORTA para no enviar newsletters incompletas.
+    if len(game_ids) < 8:
+        print(f"⚠️ ALERTA: Solo he encontrado {len(game_ids)} partidos para la J{target_jornada}.")
+        print("⛔ Probablemente falten partidos por cargar en la web. ABORTANDO.")
+        return
+    # -------------------------------------
+
     if not game_ids:
-        print(f"⛔ Jornada {target_jornada} sin partidos o futura.")
+        print(f"⛔ Jornada {target_jornada} sin partidos.")
         return
 
     finished_count = 0
@@ -182,8 +182,7 @@ def main():
         tiempo_cumplido = gestionar_buffer(target_jornada)
         
         if tiempo_cumplido:
-            print("🚀 Buffer superado. Iniciando actualización de datos y envío...")
-            
+            print("🚀 Buffer superado. Enviando...")
             exito = ejecutar_secuencia_completa(target_jornada)
             
             if exito:
@@ -195,13 +194,12 @@ def main():
                 
                 if os.path.exists(BUFFER_FILE):
                     os.remove(BUFFER_FILE)
-                    
-                print("🏁 Proceso finalizado con éxito.")
+                print("🏁 Éxito total.")
         else:
             print("zzz Esperando buffer...")
-            
     else:
         print("⚽ Aún se está jugando.")
+        # Limpieza preventiva por si hubo un falso positivo antes
         if os.path.exists(BUFFER_FILE):
              os.remove(BUFFER_FILE)
 
