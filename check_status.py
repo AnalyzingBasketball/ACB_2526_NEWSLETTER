@@ -3,8 +3,8 @@ import os
 import re
 import datetime
 import subprocess 
-import time          # <--- NUEVO
-import random        # <--- NUEVO
+import time
+import random
 from bs4 import BeautifulSoup
 
 # ==============================================================================
@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup
 # ==============================================================================
 TEMPORADA = '2025'
 COMPETICION = '1'
-HORAS_BUFFER = 0    # <--- DÉJALO EN 0 (El control lo hacemos con el cron diario)
+HORAS_BUFFER = 0    # En 0 porque ejecutamos una vez al día
 LOG_FILE = "data/log.txt"
 BUFFER_FILE = "data/buffer_control.txt"
 
@@ -136,14 +136,11 @@ def main():
         print("✅ Jornada terminada.")
         
         # --- EL TRUCO DEL FACTOR HUMANO ---
-        # Si ejecutamos a las 08:00 AM, esperamos entre 5 y 45 minutos aleatorios.
-        # El email llegará un día a las 08:07, otro a las 08:35, otro a las 08:42...
-        
         minutos_espera = random.randint(5, 45)
         print(f"☕ Simulando comportamiento humano... Esperando {minutos_espera} minutos antes de enviar.")
         print("zzz...")
         
-        time.sleep(minutos_espera * 60) # El script se pausa aquí
+        time.sleep(minutos_espera * 60) # Pausa aleatoria
         
         print("⏰ ¡Despierta! Enviando ahora.")
         # ----------------------------------
