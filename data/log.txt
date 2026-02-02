@@ -15,3 +15,4 @@
 2025-01-22 21:11 : ✅ Jornada 15 completada y enviada.
 2026-01-22 21:16 : ✅ Jornada 16 completada y enviada.
 2026-01-26 15:16 : ✅ Jornada 17 completada y enviada.
+2026-02-02 08:16 : ✅ Jornada 18 completada y enviada.
