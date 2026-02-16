@@ -399,20 +399,29 @@ print(f"🤖 Analizando {ultima_jornada_label}...")
 # 5. PREPARACIÓN DE DATOS (CON LIMPIEZA AUTOMÁTICA)
 # ==============================================================================
 
-# A. MVP
+# A. MVP (AHORA SOPORTA MÚLTIPLES MVPs)
 ganadores = df_week[df_week['Win'] == 1]
 pool = ganadores if not ganadores.empty else df_week
-mvp = pool.sort_values('VAL', ascending=False).iloc[0]
 
-# --- AQUÍ OCURRE LA MAGIA ---
-mvp_name = clean_name(mvp['Name']) 
-# ----------------------------
+# 1. Obtenemos cuál es la valoración máxima
+max_val = pool['VAL'].max()
 
-txt_mvp = (f"{mvp_name} ({get_team_name(mvp['Team'])}): {b(mvp['VAL'])} VAL, "
-           f"{b(mvp['PTS'])} PTS (TS%: {b(mvp['TS%'], 1, True)}), {b(mvp['Reb_T'])} REB.")
+# 2. Filtramos TODOS los jugadores que hayan alcanzado esa valoración máxima
+mvps = pool[pool['VAL'] == max_val]
+
+txt_mvp = ""
+mvp_ids = []
+
+# 3. Construimos el texto iterando sobre todos los ganadores (sea 1 o sean varios)
+for _, mvp_row in mvps.iterrows():
+    mvp_name = clean_name(mvp_row['Name'])
+    txt_mvp += (f"- {mvp_name} ({get_team_name(mvp_row['Team'])}): {b(mvp_row['VAL'])} VAL, "
+                f"{b(mvp_row['PTS'])} PTS (TS%: {b(mvp_row['TS%'], 1, True)}), {b(mvp_row['Reb_T'])} REB.\n")
+    mvp_ids.append(mvp_row['PlayerID']) # Guardamos los IDs para excluirlos de destacados
 
 # B. DESTACADOS
-resto = df_week[df_week['PlayerID'] != mvp['PlayerID']]
+# Excluimos a TODOS los MVPs (usando isin en lugar de != para soportar listas)
+resto = df_week[~df_week['PlayerID'].isin(mvp_ids)]
 top_rest = resto.sort_values('VAL', ascending=False).head(3)
 txt_rest = ""
 for _, row in top_rest.iterrows():
@@ -494,7 +503,7 @@ ASUNTO: [Aquí tu frase clickbait increíble]
 
 ## 🏀 Informe ACB: {ultima_jornada_label}
 
-### 👑 El MVP
+### 👑 MVP
 [Análisis del MVP]
 
 ### 🚀 Radar de Eficiencia
