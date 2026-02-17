@@ -527,12 +527,3 @@ try:
     guardar_salida(texto)
 except Exception as e:
     guardar_salida(f"❌ Error Gemini: {e}")
-
-try:
-    print("🚀 Generando crónica (Modo Infalible)...")
-    model = genai.GenerativeModel(MODEL_NAME)
-    response = model.generate_content(prompt)
-    texto = response.text.replace(":\n-", ":\n\n-")
-    guardar_salida(texto)
-except Exception as e:
-    guardar_salida(f"❌ Error Gemini: {e}")
