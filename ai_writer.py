@@ -476,13 +476,13 @@ if len(jornadas_unicas) >= 1:
                        f"{b(row['VAL'], 1)} VAL, {b(row['PTS'], 1)} PTS, {b(row['AST'], 1)} AST.\n")
 
 # ==============================================================================
-# 6. GENERACIÓN IA (TEXTO PURO, SIN HERRAMIENTAS, 100% FIABLE)
+# 6. GENERACIÓN IA (TEXTO PURO, MANUAL DE ESTILO EDITORIAL)
 # ==============================================================================
 
 prompt = f"""
-Actúa como Periodista Deportivo experto en la Liga Endesa (ACB) y Copywriter de Email Marketing viral.
+Actúa como Redactor Jefe de una newsletter premium y analítica sobre la Liga Endesa (ACB). Tu objetivo es convertir datos estadísticos avanzados en una crónica narrativa de alto nivel.
 
-DATOS DE LA JORNADA (Nombres ya verificados):
+DATOS DE LA JORNADA (Inamovibles):
 MVP: {txt_mvp}
 DESTACADOS:
 {txt_rest}
@@ -493,29 +493,40 @@ CONTEXTO:
 TENDENCIAS:
 {txt_trends}
 
-INSTRUCCIONES:
-1. **REGLA DE ORO DEL TONO:** Escribe SIEMPRE de "tú", NUNCA de "usted". Dirígete al lector de forma directa, cercana y apasionada por el baloncesto. Escribe como si fueras un colega contándole el resumen de la jornada a otro loco del basket tomando un café. Usa un tono vibrante y coloquial, pero profesional (cercano, pero sin exceso de confianza ni palabras malsonantes).
-2. **PRIMERA LÍNEA OBLIGATORIA**: Escribe una frase corta (máx 50 caracteres), impactante y estilo "clickbait" que resuma lo más loco de la jornada. EMPIEZA LA LÍNEA CON "ASUNTO:".
-3. **RESPETA LOS NOMBRES**: Úsalos tal cual aparecen arriba.
-4. **NARRATIVA**: Crónica con ritmo, que enganche desde la primera línea. Involucra al lector ("Fíjate en lo que hizo...", "¿Has visto el partido de...?").
+MANUAL DE ESTILO Y TONO (CUMPLIMIENTO ESTRICTO):
+1. PERSPECTIVA Y TRATO: Dirígete al lector de manera individual, exclusivamente en segunda persona del singular ("tú"). Queda terminantemente prohibido el uso de fórmulas de cortesía ("usted") o plurales genéricos ("vosotros", "lectores", "suscriptores"). La redacción debe proyectar una comunicación confidencial y directa (1 a 1).
+2. REGISTRO LINGÜÍSTICO: Emplea un registro coloquial culto. El tono debe ser el de un analista experto que comparte información privilegiada con un socio del mismo nivel técnico. 
+3. RIGOR Y ELEGANCIA: Mantén la máxima profesionalidad periodística. Expresa pasión y dinamismo a través del análisis del juego, descartando por completo cualquier tipo de jerga informal, expresiones adolescentes o vocabulario no profesional.
+4. TÉCNICA NARRATIVA: Integra la estadística en una narración fluida y ágil. Evita la enumeración robótica de datos. Utiliza recursos retóricos elegantes (preguntas directas al lector, oraciones cortas para dar ritmo) para maximizar la retención.
+5. FORMATO DE ENTREGA: Genera única y exclusivamente el texto final estructurado. Omite saludos automatizados, confirmaciones de instrucciones o cualquier texto fuera de la estructura solicitada.
 
-ESTRUCTURA DE SALIDA (ESTRICTA):
-ASUNTO: [Aquí tu frase clickbait increíble]
+ESTRUCTURA EXACTA DE SALIDA:
+
+ASUNTO: [Una sola frase corta, máx 50 caracteres, impactante y magnética. Empieza con "ASUNTO:"]
 
 ## 🏀 Informe ACB: {ultima_jornada_label}
 
 ### 👑 El MVP
-[Análisis del MVP o MVPs, hablándole de tú al lector]
+[Crónica narrativa del MVP o MVPs, aplicando el manual de estilo. Aporta contexto cualitativo a sus métricas]
 
 ### 🚀 Radar de Eficiencia
-[Análisis de destacados y contexto, manteniendo el tono cercano]
+[Análisis de los destacados y el contexto. Mantén el ritmo rápido y la conexión directa con el lector]
 
 ### 🧠 Pizarra Táctica
-[Análisis de equipos, explicando los datos de forma atractiva]
+[Análisis de los equipos: Ataque, Fluidez, Control. Traduce la eficiencia ofensiva y el ratio de asistencias/pérdidas a conceptos de juego real]
 
 ### 🔥 Quién está On Fire (Últimas Jornadas)
 {txt_trends}
 """
+
+try:
+    print("🚀 Generando crónica (Modo Editorial Premium)...")
+    model = genai.GenerativeModel(MODEL_NAME)
+    response = model.generate_content(prompt)
+    texto = response.text.replace(":\n-", ":\n\n-")
+    guardar_salida(texto)
+except Exception as e:
+    guardar_salida(f"❌ Error Gemini: {e}")
 
 try:
     print("🚀 Generando crónica (Modo Infalible)...")
