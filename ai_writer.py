@@ -6,7 +6,7 @@ import re
 import numpy as np
 
 # ==============================================================================
-# 1. CONFIGURACIÓN - LIGA REGULAR ACB
+# 1. CONFIGURACIÓN ESPECIAL LIGA ENDESA (ACB)
 # ==============================================================================
 MODEL_NAME = "gemini-2.5-flash"
 FILE_PATH = "data/BoxScore_ACB_2025_Cumulative.csv"
@@ -20,7 +20,7 @@ TEAM_MAP = {
     'VBC': 'Valencia Basket', 'BAR': 'Barça'
 }
 
-# Mapa de Entrenadores (Temporada 2025/2026)
+# Mapa de Entrenadores (Temporada 2025/2026 - ACTUALIZADO OFICIAL)
 COACH_MAP = {
     'BAR': 'Xavi Pascual', 'RMB': 'Sergio Scariolo', 'UNI': 'Ibon Navarro',
     'BKN': 'Paolo Galbiati', 'VBC': 'Pedro Martínez', 'UCM': 'Sito Alonso',
@@ -31,7 +31,7 @@ COACH_MAP = {
 }
 
 # ==============================================================================
-# 2. DICCIONARIO MAESTRO DE JUGADORES (TODOS LOS EQUIPOS ACB)
+# 2. DICCIONARIO MAESTRO DE JUGADORES (ACB)
 # ==============================================================================
 CORRECCIONES_VIP = {
     # --- BARÇA (BAR) ---
@@ -69,7 +69,7 @@ CORRECCIONES_VIP = {
     # --- UNICAJA (UNI) ---
     "A. Butajevas": "Arturas Butajevas", "A. Díaz": "Alberto Díaz", "A. Rubit": "Augustine Rubit", "C. Audige": "Chase Audige", "C. Duarte": "Chris Duarte", "D. Kravish": "David Kravish", "E. Sulejmanovic": "Emir Sulejmanovic", "J. Barreiro": "Jonathan Barreiro", "J. Webb": "James Webb III", "K. Perry": "Kendrick Perry", "K. Tillie": "Killian Tillie", "N. Djedovic": "Nihad Djedovic", "O. Balcerowski": "Olek Balcerowski", "T. Kalinoski": "Tyler Kalinoski", "T. Pérez": "Tyson Pérez", "X. Castañeda": "Xavier Castañeda",
     # --- VALENCIA BASKET (VBC) ---
-    "B. Badio": "Brancou Badio", "B. Key": "Braxton Key", "D. Thompson": "Darius Thompson", "I. Iroegbu": "Ike Iroegbu", "I. Nogués": "Isaac Nogués", "J. Montero": "Jean Montero", "J. Pradilla": "Jaime Pradilla", "J. Puerto": "Josep Puerto", "K. Taylor": "Kameron Taylor", "López-Arostegui": "Xabi López-Arostegui", "M. Costello": "Matt Costello", "N. Reuvers": "Nate Reuvers", "N. Sako": "Neal Sako", "O. Moore": "Omari Moore", "S. de Larrea": "Sergio de Larrea", "Y. Sima": "Yankuba Sima"
+    "B. Badio": "Brancou Badio", "B. Key": "Braxton Key", "D. Thompson": "Darius Thompson", "I. Iroegbu": "Ike Iroegbu", "I. Nogués": "Isaac Nogués", "J. Montero": "Jean Montero", "J. Pradilla": "Jaime Pradilla", "J. Puerto": "Josep Puerto", "K. Taylor": "Kameron Taylor", "López-Arostegui": "Xabi López-Arostegui", "M. Costello": "Matt Costello", "N. Reuvers": "Nathan Reuvers", "N. Sako": "Neal Sako", "O. Moore": "Omari Moore", "S. de Larrea": "Sergio de Larrea", "Y. Sima": "Yankuba Sima"
 }
 
 # ==============================================================================
@@ -184,68 +184,67 @@ if len(jornadas_unicas) >= 1:
                        f"{b(row['VAL'], 1)} VAL, {b(row['PTS'], 1)} PTS, {b(row['AST'], 1)} AST.\n")
 
 # ==============================================================================
-# 6. INSTRUCCIONES DE BÚSQUEDA WEB PARA LA LIGA REGULAR
+# 6. INSTRUCCIONES ESPECÍFICAS PARA LA JORNADA (SIN BUSCADOR REAL)
 # ==============================================================================
-instrucciones_especificas = f"""
-INSTRUCCIONES DE BÚSQUEDA WEB (USO OBLIGATORIO DE GOOGLE SEARCH):
-1. CONTEXTO DE LA CLASIFICACIÓN Y LA JORNADA: Busca "Noticias resumen {ultima_jornada_label} Liga Endesa ACB 2026". Averigua si ha habido sorpresas, victorias clave a domicilio, o movimientos críticos en la clasificación (lucha por entrar en Playoffs, cabeza de serie, o escapar del descenso).
-2. EL MVP OFICIAL: Busca "MVP {ultima_jornada_label} Liga Endesa ACB 2026" para confirmar quién se llevó el galardón oficial y crúzalo con los datos de "Top Performers" que tienes más abajo.
-3. JUGADAS DECISIVAS: Averigua a través de la búsqueda si hubo algún tiro sobre la bocina, prórrogas o actuaciones clave en el último cuarto e intégralas sutilmente en la crónica.
+instrucciones_especificas = """
+INSTRUCCIONES ESPECÍFICAS PARA LA JORNADA LIGUERA:
+1. ANÁLISIS DEL MVP: Basa tu análisis del MVP ESTRICTAMENTE en el jugador con mayor valoración (VAL) de los datos proporcionados arriba. Nómbralo en el primer párrafo y analiza su hoja estadística.
+2. CONTEXTO LIGUERO: Menciona la importancia de esta actuación para su equipo en el contexto de la larga liga regular (ganar fuera, mantenerse arriba, etc.).
+3. JUGADAS DETERMINANTES: Basándote en el perfil estadístico de los mejores jugadores, recrea de forma realista y coherente 1 o 2 momentos tácticos del partido para dar contexto a los fríos datos.
+4. Analiza el RITMO DEL PARTIDO basándote en los datos estadísticos de equipos proporcionados (ORTG, posesiones, ratios).
 """
 
 # ==============================================================================
-# 7. GENERACIÓN IA CON GOOGLE SEARCH Y REGLAS ESTRICTAS
+# 7. GENERACIÓN IA SIN HERRAMIENTAS EXTERNAS Y REGLAS ESTRICTAS
 # ==============================================================================
 
 prompt = f"""
-Actúa como un analista de baloncesto profesional y periodista deportivo de élite.
-Estás redactando el informe 'Analyzing Basketball' para la Liga Regular ACB.
+    Actúa como un analista de baloncesto profesional y periodista deportivo de élite.
+    Estás redactando la newsletter 'Analyzing Basketball' sobre la Liga Endesa (ACB).
+    
+    JORNADA ACTUAL: {ultima_jornada_label}
+    
+    DATOS DE LOS JUGADORES (Top Performers Estadísticos):
+    {txt_mejores}
+    {txt_rest}
+    
+    DATOS DE LOS EQUIPOS (Eficiencia y Entrenadores):
+    {txt_teams}
+    
+    ESTADO DE FORMA (Promedios últimas 3 jornadas):
+    {txt_trends}
+    
+    {instrucciones_especificas}
+    
+    REGLAS DE ESTILO (¡MUY ESTRICTAS Y DE OBLIGADO CUMPLIMIENTO!):
+    1. TONO Y AUDIENCIA: Profesional, analítico y estrictamente periodístico. Escribes para expertos en baloncesto en ESPAÑA. Transmite la dificultad de la liga regular ACB.
+    2. IDIOMA (ESPAÑOL DE ESPAÑA PURO): Tienes TERMINANTEMENTE PROHIBIDO usar vocabulario latinoamericano. Usa "mate" (nunca volcada), "parqué/cancha" (nunca duela), y "tiros libres" (nunca lanzamiento de personal).
+    3. CERO EMOJIS (CRÍTICO): Está TOTALMENTE PROHIBIDO usar emojis en cualquier parte del texto. NI UNO SOLO en el asunto, NI en los títulos, NI en el cuerpo.
+    4. TRATO AL LECTOR (IMPERSONAL): NO te dirijas al lector bajo ningún concepto. Tienes PROHIBIDO usar "tú", PROHIBIDO usar "vosotros" y PROHIBIDO tratar de "usted". Escribe exclusivamente en tercera persona o usando formas impersonales ("se observa", "el equipo logró", "destaca"). Cero preguntas retóricas.
+    5. ENTRENADORES Y ALUCINACIONES: Usa estrictamente los nombres de los entrenadores proporcionados en los datos. No inventes rotaciones.
+    6. RITMO Y VOZ ACTIVA: Cero dramatismos literarios ("a vida o muerte", "clavo en el ataúd"). Escribe en voz activa. Que los datos sostengan tu análisis.
+    7. VOCABULARIO DE PARQUÉ: Usa terminología técnica real de baloncesto con naturalidad (spacing, pick & roll central, mismatch, IQ, colapso defensivo, tiro tras bote, generación de ventajas, lado débil).
 
-FASE ACTUAL: {ultima_jornada_label}
+    ESTRUCTURA DE SALIDA (ESTRICTA):
+    ASUNTO: [Escribe aquí un asunto atractivo, muy profesional, que denote la jornada, basado en los mejores datos y ESTRICTAMENTE SIN NINGÚN EMOJI]
 
-DATOS DE LOS JUGADORES (Top Performers de la Jornada):
-TOP PERFORMERS:
-{txt_mejores}
-DESTACADOS:
-{txt_rest}
+    ## Informe Liga Endesa: {ultima_jornada_label}
 
-DATOS DE LOS EQUIPOS (Eficiencia de la Jornada):
-{txt_teams}
+    ### MVP y Puntos Clave de la Jornada
+    [Redacta la crónica principal basándote exclusivamente en los datos aportados. Combina el análisis del rendimiento estadístico con el contexto de la competición liguera.]
 
-ESTADO DE FORMA (Promedios últimas 3 jornadas):
-{txt_trends}
+    ### Radar de Eficiencia y Pizarra Táctica
+    [Redacta el análisis del rendimiento de los equipos. Usa los datos de Puntos por 100 posesiones, Asistencias o Pérdidas y menciona a sus entrenadores reales proporcionados. Traduce esto a cómo fue el ritmo y el control táctico.]
 
-{instrucciones_especificas}
-
-REGLAS DE ESTILO (¡MUY ESTRICTAS Y DE OBLIGADO CUMPLIMIENTO!):
-1. TONO Y AUDIENCIA: Profesional, analítico y estrictamente periodístico. Escribes para expertos en baloncesto en ESPAÑA. Transmite la dificultad de la maratón de la liga regular (gestión de cansancio, dificultad de ganar a domicilio, presión por la clasificación).
-2. IDIOMA (ESPAÑOL DE ESPAÑA PURO): Tienes TERMINANTEMENTE PROHIBIDO usar vocabulario latinoamericano o anglicismos innecesarios. Usa "mate" (nunca volcada), "parqué/cancha" (nunca duela), "clubes" (nunca franquicias) y "tiros libres" (nunca lanzamiento de personal).
-3. CERO EMOJIS (CRÍTICO): Está TOTALMENTE PROHIBIDO usar emojis en cualquier parte del texto. NI UNO SOLO en el asunto, NI en los títulos, NI en el cuerpo.
-4. TRATO AL LECTOR (IMPERSONAL): NO te dirijas al lector bajo ningún concepto. Tienes PROHIBIDO usar "tú", PROHIBIDO usar "vosotros" y PROHIBIDO tratar de "usted". Escribe exclusivamente en tercera persona o usando formas impersonales ("se observa", "el equipo logró", "destaca"). Cero preguntas retóricas.
-5. ENTRENADORES Y ALUCINACIONES: Usa estrictamente los nombres de los entrenadores proporcionados en los datos y limítate a analizar lo ocurrido en la cancha.
-6. RITMO Y VOZ ACTIVA: Emplea un tono de análisis sosegado pero contundente. Escribe en voz activa. Evita recursos literarios exagerados; que los datos sostengan el relato.
-7. VOCABULARIO DE PARQUÉ ACB: Usa terminología técnica real de baloncesto FIBA con naturalidad (spacing, pick & roll central, mismatch, IQ, colapso defensivo, tiro tras bote, generación de ventajas, lado débil, extrapass).
-
-ESTRUCTURA DE SALIDA (ESTRICTA):
-ASUNTO: [Escribe aquí un asunto analítico, muy profesional, basado en lo ocurrido en la {ultima_jornada_label}. ESTRICTAMENTE SIN NINGÚN EMOJI]
-
-## Informe Liga Endesa: {ultima_jornada_label}
-
-### MVP y Puntos Clave de la Jornada
-[Redacta la crónica principal basándote en tu búsqueda de Google (MVP real, movimientos en la tabla, victorias a domicilio). Cruza la narrativa de la liga regular con las estadísticas del TOP PERFORMER aportado en los datos.]
-
-### Radar de Eficiencia y Pizarra Táctica
-[Analiza el rendimiento de los equipos de esta semana. Usa los datos de Puntos por 100 posesiones, Asistencias o Pérdidas y menciona a sus entrenadores. Explica cómo la gestión de las posesiones y la fluidez definieron los resultados.]
-
-### Jugadores en Racha (Últimas 3 Jornadas)
-[Enumera a los 5 jugadores con mayor valoración reciente en este formato exacto, usando guiones:]
-{txt_trends}
+    ### Jugadores en Racha (Últimas 3 Jornadas)
+    [Enumera a los 5 jugadores con mayor valoración acumulada reciente en este formato exacto, usando guiones:]
+    {txt_trends}
 """
 
 try:
-    print(f"🚀 Generando crónica premium para {ultima_jornada_label} con Grounding Search...")
-    # Ejecutamos el modelo llamando a la herramienta de búsqueda de Google
-    model = genai.GenerativeModel(model_name=MODEL_NAME, tools="google_search_retrieval")
+    print(f"🚀 Generando crónica premium para {ultima_jornada_label}...")
+    # SE ELIMINÓ tools="google_search" PARA QUE NO DE ERROR
+    model = genai.GenerativeModel(model_name=MODEL_NAME)
     response = model.generate_content(prompt)
     texto = response.text.replace(":\n-", ":\n\n-")
     guardar_salida(texto)
