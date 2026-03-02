@@ -195,7 +195,7 @@ INSTRUCCIONES ESPECÍFICAS PARA LA JORNADA LIGUERA:
 """
 
 # ==============================================================================
-# 7. GENERACIÓN IA SIN HERRAMIENTAS EXTERNAS Y REGLAS ESTRICTAS
+# 7. GENERACIÓN IA SIN HERRAMIENTAS EXTERNAS Y REGLAS ESTRICTAS (MODO CONCISO)
 # ==============================================================================
 
 prompt = f"""
@@ -224,6 +224,7 @@ prompt = f"""
     5. ENTRENADORES Y ALUCINACIONES: Usa estrictamente los nombres de los entrenadores proporcionados en los datos. No inventes rotaciones.
     6. RITMO Y VOZ ACTIVA: Cero dramatismos literarios ("a vida o muerte", "clavo en el ataúd"). Escribe en voz activa. Que los datos sostengan tu análisis.
     7. VOCABULARIO DE PARQUÉ: Usa terminología técnica real de baloncesto con naturalidad (spacing, pick & roll central, mismatch, IQ, colapso defensivo, tiro tras bote, generación de ventajas, lado débil).
+    8. CONCISIÓN EXTREMA (CRÍTICO): La newsletter debe ser escueta, hiper-directa y fácil de escanear visualmente. Elimina toda la "paja" y las introducciones largas. Ve directo al grano usando frases cortas.
 
     ESTRUCTURA DE SALIDA (ESTRICTA):
     ASUNTO: [Escribe aquí un asunto atractivo, muy profesional, que denote la jornada, basado en los mejores datos y ESTRICTAMENTE SIN NINGÚN EMOJI]
@@ -231,10 +232,10 @@ prompt = f"""
     ## Informe Liga Endesa: {ultima_jornada_label}
 
     ### MVP y Puntos Clave de la Jornada
-    [Redacta la crónica principal basándote exclusivamente en los datos aportados. Combina el análisis del rendimiento estadístico con el contexto de la competición liguera.]
+    [Crónica hiper-concisa. MÁXIMO 2 párrafos cortos (3-4 líneas cada uno). Combina el análisis del rendimiento estadístico con el contexto de la competición liguera. Aporta los datos sin rodeos.]
 
     ### Radar de Eficiencia y Pizarra Táctica
-    [Redacta el análisis del rendimiento de los equipos. Usa los datos de Puntos por 100 posesiones, Asistencias o Pérdidas y menciona a sus entrenadores reales proporcionados. Traduce esto a cómo fue el ritmo y el control táctico.]
+    [Análisis directo y escueto. MÁXIMO 1 párrafo corto o una breve lista de viñetas (bullet points). Usa los datos de Puntos por 100 posesiones, Asistencias o Pérdidas y menciona a sus entrenadores reales proporcionados. Ve directamente a la conclusión táctica.]
 
     ### Jugadores en Racha (Últimas 3 Jornadas)
     [Enumera a los 5 jugadores con mayor valoración acumulada reciente en este formato exacto, usando guiones:]
@@ -242,7 +243,7 @@ prompt = f"""
 """
 
 try:
-    print(f"🚀 Generando crónica premium para {ultima_jornada_label}...")
+    print(f"🚀 Generando crónica premium para {ultima_jornada_label} (Modo Conciso)...")
     # SE ELIMINÓ tools="google_search" PARA QUE NO DE ERROR
     model = genai.GenerativeModel(model_name=MODEL_NAME)
     response = model.generate_content(prompt)
