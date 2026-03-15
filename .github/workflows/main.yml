@@ -8,16 +8,20 @@ on:
 permissions:
   contents: write
 
+# Apagamos el aviso amarillo de Node.js
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   run-process:
     runs-on: ubuntu-latest
     
     steps:
     - name: Checkout repo
-      uses: actions/checkout@v4 # 👈 ¡Actualizado a v4!
+      uses: actions/checkout@v4
 
     - name: Setup Python
-      uses: actions/setup-python@v5 # 👈 ¡Actualizado a v5!
+      uses: actions/setup-python@v5
       with:
         python-version: '3.9'
 
@@ -32,7 +36,7 @@ jobs:
         GMAIL_PASSWORD: ${{ secrets.GMAIL_PASSWORD }}
         URL_SUSCRIPTORES: ${{ secrets.URL_SUSCRIPTORES }}
         MAKE_WEBHOOK_URL: ${{ secrets.MAKE_WEBHOOK_URL }}
-      # 👇 AQUÍ ESTÁ EL TRUCO: Forzamos la IA y el envío directamente
+      # 👇 MODO PRUEBA: Forzamos la escritura y el envío directamente 👇
       run: |
         python ai_writer.py
         python email_sender.py
@@ -42,14 +46,7 @@ jobs:
         git config --global user.name 'ACB Bot'
         git config --global user.email 'bot@noreply.github.com'
         
-        # 1. AÑADIMOS TODOS LOS ARCHIVOS MODIFICADOS (El punto es clave)
         git add .
-        
-        # 2. GUARDAMOS EN LOCAL (Commit)
         git commit -m "Auto: Update Data & Status [skip ci]" || echo "Nada que commitear"
-        
-        # 3. SINCRONIZAMOS CON LA NUBE
         git pull --rebase origin main || git pull --rebase origin master
-        
-        # 4. SUBIMOS TODO
         git push
