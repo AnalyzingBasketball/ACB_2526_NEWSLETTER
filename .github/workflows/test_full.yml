@@ -1,4 +1,4 @@
-name: TEST - Solo AI Writer
+name: TEST - Texto + Email completo
 
 on:
   workflow_dispatch:
@@ -7,9 +7,9 @@ permissions:
   contents: write
 
 jobs:
-  test-ai:
+  test-full:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
     - name: Checkout repo
@@ -24,15 +24,22 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install pandas google-generativeai numpy
+        pip install pandas google-generativeai numpy markdown lxml
 
-    - name: Ejecutar AI Writer directamente
+    - name: Generar newsletter con AI Writer
       env:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       run: python ai_writer.py
 
-    - name: Mostrar resultado
+    - name: Mostrar texto generado
       run: |
         echo "========== NEWSLETTER GENERADA =========="
         cat newsletter_borrador.md
         echo "========================================="
+
+    - name: Enviar email de prueba
+      env:
+        GMAIL_USER: ${{ secrets.GMAIL_USER }}
+        GMAIL_PASSWORD: ${{ secrets.GMAIL_PASSWORD }}
+        URL_SUSCRIPTORES: ${{ secrets.URL_SUSCRIPTORES }}
+      run: python email_sender.py
