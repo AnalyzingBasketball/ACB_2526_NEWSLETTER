@@ -12,7 +12,7 @@ jobs:
     timeout-minutes: 10
 
     steps:
-    - name: Checkout repo
+    - name: Checkout repo (rama mejoras)
       uses: actions/checkout@v4
       with:
         ref: mejoras
@@ -24,11 +24,11 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install pandas anthropic numpy
+        pip install pandas numpy google-generativeai
 
     - name: Ejecutar AI Writer directamente
       env:
-        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       run: python ai_writer.py
 
     - name: Mostrar resultado
