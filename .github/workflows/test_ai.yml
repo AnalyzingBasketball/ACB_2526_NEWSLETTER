@@ -1,0 +1,38 @@
+name: TEST - Solo AI Writer
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test-ai:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+      with:
+        ref: mejoras
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        pip install pandas anthropic numpy
+
+    - name: Ejecutar AI Writer directamente
+      env:
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      run: python ai_writer.py
+
+    - name: Mostrar resultado
+      run: |
+        echo "========== NEWSLETTER GENERADA =========="
+        cat newsletter_borrador.md
+        echo "========================================="
