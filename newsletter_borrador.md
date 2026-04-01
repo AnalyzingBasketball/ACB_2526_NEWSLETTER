@@ -1,25 +1,25 @@
-ASUNTO: DeJulius, un MVP a base de puntos y eficiencia
+ASUNTO: DeJulius, MVP de la Jornada 23: 35 de valoración y 35 puntos
 
 ## Informe Liga Endesa: Jornada 23
 
 ### MVP y Puntos Clave
-David DeJulius (UCAM Murcia) fue el MVP de la Jornada 23 con **35** de valoración. Anotó **35** puntos con un **81.5**% de TS%. Es una barbaridad. Su USG% fue del **37.6**%. Llevó el peso ofensivo de su equipo con una claridad absoluta. No solo dominó la anotación, lo hizo con una eficiencia que rara vez se ve en un volumen tan alto. Es complicado ser el principal foco ofensivo y mantener esos porcentajes. Esta actuación demuestra su capacidad para ser el motor de su equipo.
+David DeJulius se llevó el MVP de la Jornada 23 con **35** de valoración, liderando la victoria de UCAM Murcia. Sus **35** puntos con un **81.5**% de TS% son una barbaridad. Asumió un USG% del **37.6**%, manejando gran parte de la ofensiva de su equipo. Mantener esa eficiencia con tanto volumen es el tipo de rendimiento que decide partidos, transformando cada ataque en una amenaza real. Aportó también **4** asistencias, sin necesidad de cargar con el rebote.
 
-No fue el único que tuvo una actuación anotadora destacada. Justin Jaworski (Bilbao Basket) se fue hasta los **36** puntos con un **79.5**% de TS%. Su partido fue una exhibición de puro instinto ofensivo. **0** rebotes y **1** asistencia. Su juego se centró en una única faceta, pero la dominó. La victoria de su equipo valida esa apuesta ofensiva por su parte.
+Fue una jornada de anotadores puros y eficientes. Justin Jaworski, de Bilbao Basket, también firmó una actuación memorable con **36** puntos y un **79.5**% de TS%. Otro jugador que se centró en la canasta, sin rebotes ni muchas asistencias. Ver dos rendimientos ofensivos individuales tan desproporcionados, y con tanta eficiencia, no es habitual en la misma jornada. Sus equipos lo agradecieron.
 
-Luka Bozic (Covirán Granada) también dejó su sello con **30** de valoración. Su **88.2**% de TS% es un dato que habla por sí solo. Es un jugador que produce mucho con cada balón que toca, sin necesidad de acaparar la posesión. Gonzalo Corbalán (San Pablo Burgos), con **33** de valoración, mostró un juego más completo. Sumó **26** puntos, **4** rebotes y **6** asistencias. Su capacidad para generar en diferentes facetas sigue siendo clave para su equipo, incluso en la derrota. Ethan Happ (San Pablo Burgos) con **27** de valoración y **22** puntos y **9** rebotes, mantuvo su línea de solidez.
+Otros nombres destacaron en el Top 5 por su capacidad de sumar en más facetas. Gonzalo Corbalán (San Pablo Burgos) alcanzó **33** de valoración con **26** puntos, **4** rebotes y **6** asistencias, mostrando una producción más completa, aunque su equipo no ganara. Su TS% fue del **61.3**%. Luka Bozic (Covirán Granada) llegó a **30** de valoración. Consiguió **18** puntos, **3** rebotes y **7** asistencias con una eficiencia altísima: **88.2**% de TS%. Es difícil encontrar un partido donde Bozic no sume en todas las facetas del juego. Ethan Happ, también de San Pablo Burgos, firmó **27** de valoración, con **22** puntos y **9** rebotes. Un doble-doble casi perfecto que reafirma su importancia en la pintura y su constante aportación.
 
 ### Radar de Eficiencia
-Casademont Zaragoza se llevó el premio al mejor ataque con **137.4** puntos por **100** posesiones. Es una cifra que sugiere que el sistema de Joan Plaza está funcionando a pleno rendimiento. Han encontrado la forma de generar tiros de calidad y ejecutarlos con acierto. Es una buena señal de la cohesión ofensiva del grupo.
+Casademont Zaragoza fue el Mejor Ataque de la jornada, con **137.4** puntos por **100** posesiones. El sistema de Joan Plaza sigue demostrando su capacidad para generar ofensiva, sin importar el rival.
 
-La otra cara de la moneda fue Dreamland Gran Canaria, con **95.4** puntos por **100** posesiones. Una actuación ofensiva muy por debajo de su nivel habitual. Una cifra tan baja apunta a problemas más profundos que un simple mal día en el tiro. Jaka Lakovic tendrá que ajustar para recuperar el ritmo anotador y la fluidez.
+En el otro extremo, Dreamland Gran Canaria registró el Peor Ataque con **95.4** puntos por **100** posesiones. Una cifra que señala los problemas de Jaka Lakovic para encontrar fluidez en su equipo.
 
-San Pablo Burgos volvió a ser el equipo más fluido, con **34.4** asistencias por **100** posesiones. El equipo de Porfi Fisac basa su juego en la circulación de balón. No buscan el uno contra uno, sino la ventaja generada por el pase extra. Es un baloncesto coral que funciona cuando los engranajes se ajustan.
+San Pablo Burgos mostró la Mejor Fluidez, con **34.4** asistencias por **100** posesiones. El baloncesto de Porfi Fisac se basa en el movimiento de balón y en encontrar al compañero liberado. Funciona.
 
-El Barça, bajo la dirección de Xavi Pascual, mantuvo su impecable control del balón, con solo **8.5** pérdidas por **100** posesiones. No regalan nada. Es una constante en su juego: cada posesión cuenta. Minimizar los errores es una seña de identidad que les permite competir en cada partido.
+El Barça, bajo Xavi Pascual, volvió a demostrar su Mejor Control, con solo **8.5** pérdidas por **100** posesiones. Es la disciplina de siempre: cero regalos, cada posesión cuenta.
 
 ### Nombre Propio
-Justin Jaworski (Bilbao Basket) fue el outsider de la jornada. Su valoración de **28** contrasta enormemente con su media de **6.4** en la temporada. Anotó **36** puntos con una eficiencia del **79.5**% de TS%. Es un jugador que puede explotar en cualquier momento, y esta jornada fue la prueba definitiva. Su impacto se centró casi exclusivamente en la anotación, y funcionó para la victoria de su equipo. Un salto de **21.6** puntos de valoración no es algo habitual.
+Justin Jaworski tuvo su día grande. Sus **28** de valoración en esta jornada contrastan con su media de temporada de **6.4**. Un salto de **+21.6** puntos. Anotó **36** puntos con un **79.5**% de TS%, haciendo su mejor partido de la temporada y liderando la victoria de Bilbao Basket. Este tipo de explosiones ofensivas, viniendo de un jugador con un rol más discreto habitualmente, son las que cambian dinámicas.
 
 ### En Racha (3 jornadas)
 - David DeJulius (UCM): **25.3** VAL, **24.0** PTS, **4.3** AST, TS%: **70.4**%.
