@@ -35,15 +35,6 @@ jobs:
         MAKE_WEBHOOK_URL: ${{ secrets.MAKE_WEBHOOK_URL }}
       run: python check_status.py
 
-    # --- ESTE ES EL PASO NUEVO QUE FALTABA ---
-    - name: Enviar Newsletter
-      env:
-        GMAIL_USER: ${{ secrets.GMAIL_USER }}
-        GMAIL_PASSWORD: ${{ secrets.GMAIL_PASSWORD }}
-        URL_SUSCRIPTORES: ${{ secrets.URL_SUSCRIPTORES }}
-      run: python email_sender.py
-    # ------------------------------------------
-
     - name: Guardar cambios en Data
       run: |
         git config --global user.name 'ACB Bot'
