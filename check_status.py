@@ -49,28 +49,31 @@ def get_last_jornada_from_log():
 
 def get_game_ids(temp_id, comp_id, jornada_id):
     url = f"https://www.acb.com/resultados-clasificacion/ver/temporada_id/{temp_id}/competicion_id/{comp_id}/jornada_numero/{jornada_id}"
+    print(f"🔍 Escaneando URL: {url}")
     ids = []
     try:
-        r = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10)
+        # Usamos un User-Agent de navegador real para evitar bloqueos 403
+        r = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}, timeout=10)
+        print(f"📡 Código de respuesta ACB: {r.status_code}")
+        
         soup = BeautifulSoup(r.content, 'html.parser')
         
         for a in soup.find_all('a', href=True):
             href = a['href'].lower()
             
-            # 1. Filtramos que sea un enlace de un partido
-            if "partido" in href:
-                # 2. Buscamos el ID numérico (compatible con formato viejo y nuevo)
-                match = re.search(r'(?:/id/|-)(\d+)(?:/|#|$|estadisticas)', href)
-                
-                if match:
-                    try:
-                        pid = int(match.group(1))
-                        ids.append(pid)
-                    except: 
-                        pass
-        return list(set(ids))
+            # Filtro ancho: buscamos cualquier enlace que huela a partido
+            if any(palabra in href for palabra in ["partido", "estadistica", "live"]):
+                # Cazamos a lo bruto cualquier número de 5 o 6 cifras dentro del enlace
+                numeros = re.findall(r'\b(\d{5,6})\b', href)
+                for num in numeros:
+                    ids.append(int(num))
+                    
+        ids_finales = list(set(ids))
+        print(f"🎯 IDs encontrados: {ids_finales}")
+        return ids_finales
+        
     except Exception as e: 
-        print(f"Error extrayendo IDs: {e}")
+        print(f"❌ Error extrayendo IDs: {e}")
         return []
 
 def is_game_finished(game_id):
