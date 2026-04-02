@@ -5,6 +5,7 @@ import datetime
 import subprocess 
 import time
 import random
+import sys
 
 # ==============================================================================
 # CONFIGURACIÓN
@@ -15,7 +16,6 @@ LOG_FILE = "data/log.txt"
 BUFFER_FILE = "data/buffer_control.txt"
 
 # 🚨 INTERRUPTOR DE PRUEBAS 🚨
-# Cambia a True para probar sin esperas. Cámbialo a False para la ejecución real automatizada.
 MODO_PRUEBA = True  
 
 # API Key y Headers
@@ -27,10 +27,6 @@ HEADERS_API = {
     'Referer': 'https://www.acb.com/es/liga/calendario',
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.4 Safari/605.1.15'
 }
-
-# ==============================================================================
-# ZONA 1: FUNCIONES DE EXTRACCIÓN Y ESTADO
-# ==============================================================================
 
 def get_last_jornada_from_log():
     if not os.path.exists(LOG_FILE):
@@ -45,110 +41,54 @@ def get_last_jornada_from_log():
                     num = int(match.group(1))
                     if num > last_jornada:
                         last_jornada = num
-    except Exception as e:
-        print(f"Error leyendo log: {e}")
+    except:
         return 0
     return last_jornada
 
 def get_game_ids(temp_id, comp_id, jornada_id):
     url_base = f"https://api2.acb.com/api/seasondata/Competition/matches?competitionId={comp_id}"
-    print(f"🔍 Fase 1: Obteniendo mapeo de rondas para la Jornada {jornada_id}...")
-    ids = []
-    
     try:
         r_base = requests.get(url_base, headers=HEADERS_API, timeout=15)
-        print(f"📡 Código de respuesta API (Fase 1): {r_base.status_code}")
-        
         if r_base.status_code == 200:
             data = r_base.json()
-            
             rondas = data.get('availableFilters', {}).get('rounds', [])
-            round_id_interno = None
-            
-            for ronda in rondas:
-                if str(ronda.get('roundNumber')) == str(jornada_id):
-                    round_id_interno = ronda.get('id')
-                    break
-            
-            if not round_id_interno:
-                print(f"⚠️ No se encontró el ID interno en la API para la Jornada {jornada_id}.")
-                return []
-                
-            print(f"🔗 Correspondencia encontrada: Jornada {jornada_id} = roundId {round_id_interno}")
-            
+            round_id_interno = next((r.get('id') for r in rondas if str(r.get('roundNumber')) == str(jornada_id)), None)
+            if not round_id_interno: return []
             url_jornada = f"https://api2.acb.com/api/seasondata/Competition/matches?competitionId={comp_id}&roundId={round_id_interno}"
-            print(f"🔍 Fase 2: Extrayendo partidos del roundId {round_id_interno}...")
-            
             r_jornada = requests.get(url_jornada, headers=HEADERS_API, timeout=15)
-            print(f"📡 Código de respuesta API (Fase 2): {r_jornada.status_code}")
-            
             if r_jornada.status_code == 200:
-                data_jornada = r_jornada.json()
-                partidos = data_jornada.get('matches', [])
-                
-                for partido in partidos:
-                    game_id = partido.get('id')
-                    if game_id:
-                        ids.append(game_id)
-                        
-                print(f"🎯 IDs encontrados para Jornada {jornada_id}: {ids}")
-                return ids
-            else:
-                print(f"⚠️ Error en Fase 2. Código: {r_jornada.status_code}")
-                return []
-                
-        else:
-            print(f"⚠️ La API base devolvió un error inesperado. Código: {r_base.status_code}")
-            return []
-
-    except Exception as e: 
-        print(f"❌ Error crítico conectando con la API: {e}")
+                return [p.get('id') for p in r_jornada.json().get('matches', []) if p.get('id')]
+        return []
+    except:
         return []
 
 def is_game_finished(game_id):
     url = "https://api2.acb.com/api/matchdata/Result/boxscores"
     try:
         r = requests.get(url, params={'matchId': game_id}, headers=HEADERS_API, timeout=5)
-        if r.status_code != 200: return False
-        data = r.json()
-        if 'teamBoxscores' not in data or len(data['teamBoxscores']) < 2: return False
-        return True
+        return 'teamBoxscores' in r.json()
     except: return False
-
-# ==============================================================================
-# ZONA 2: SECUENCIA DE ENVÍO
-# ==============================================================================
 
 def ejecutar_secuencia_completa(jornada):
     print(f"🔄 Iniciando secuencia completa para Jornada {jornada}...")
 
-    NOMBRE_SCRIPT_DATOS = "boxscore_ACB_headless.py"
-    print(f"📥 0. Ejecutando {NOMBRE_SCRIPT_DATOS}...")
+    # PASO 0: SCRAPER
     try:
-        subprocess.run(["python", NOMBRE_SCRIPT_DATOS], check=True, text=True)
-        print("✅ Datos actualizados correctamente.")
-    except subprocess.CalledProcessError as e:
-        print(f"❌ Error crítico actualizando datos: {e}")
-        return False
+        subprocess.run(["python", "boxscore_ACB_headless.py"], check=True)
+    except: return False
 
-    print("🤖 1. Ejecutando ai_writer.py...")
+    # PASO 1: IA (Le pasamos el número de jornada como argumento)
+    print(f"🤖 1. Ejecutando ai_writer.py para Jornada {jornada}...")
     try:
-        subprocess.run(["python", "ai_writer.py"], check=True, text=True)
-    except subprocess.CalledProcessError as e:
-        print(f"❌ Error crítico en ai_writer: {e}")
-        return False
+        subprocess.run(["python", "ai_writer.py", str(jornada)], check=True)
+    except: return False
 
+    # PASO 2: EMAIL
     print("📧 2. Ejecutando email_sender.py...")
     try:
-        subprocess.run(["python", "email_sender.py"], check=True, text=True)
+        subprocess.run(["python", "email_sender.py"], check=True)
         return True
-    except subprocess.CalledProcessError as e:
-        print(f"❌ Error crítico en email_sender: {e}")
-        return False
-
-# ==============================================================================
-# MAIN 
-# ==============================================================================
+    except: return False
 
 def main():
     last_sent = get_last_jornada_from_log()
@@ -158,50 +98,20 @@ def main():
     print(f"Revisando Jornada/Semana: {target_jornada}")
 
     game_ids = get_game_ids(TEMPORADA, COMPETICION, str(target_jornada))
-    
-    if len(game_ids) < 8:
-        print(f"⚠️ Solo veo {len(game_ids)} partidos. Faltan datos o ha cambiado la API. No envío nada.")
-        return
+    if len(game_ids) < 8: return
 
-    finished_count = 0
-    for gid in game_ids:
-        if is_game_finished(gid):
-            finished_count += 1
-    
+    finished_count = sum(1 for gid in game_ids if is_game_finished(gid))
     print(f"📊 Estado: {finished_count}/{len(game_ids)} terminados.")
 
-    # Filtro: Mínimo de partidos terminados (Ej: 7 de 9)
-    MIN_PARTIDOS_TERMINADOS = 7
-
-    if finished_count >= MIN_PARTIDOS_TERMINADOS:
-        print(f"✅ Jornada dada por terminada ({finished_count} jugados de {len(game_ids)}).")
+    if finished_count >= 7:
+        if not MODO_PRUEBA:
+            time.sleep(random.randint(5, 45) * 60)
         
-        # --- CONTROL DE ESPERA (MODO PRUEBA) ---
-        if MODO_PRUEBA:
-            print("🚀 MODO PRUEBA ACTIVADO: Disparando secuencia instantáneamente, sin esperas.")
-        else:
-            minutos_espera = random.randint(5, 45)
-            print(f"☕ Simulando comportamiento humano... Esperando {minutos_espera} minutos antes de enviar.")
-            print("zzz...")
-            time.sleep(minutos_espera * 60) 
-            print("⏰ ¡Despierta! Enviando ahora.")
-        # --------------------------------------
-
-        exito = ejecutar_secuencia_completa(target_jornada)
-        
-        if exito:
+        if ejecutar_secuencia_completa(target_jornada):
             fecha_log = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-            linea_log = f"{fecha_log} : ✅ Jornada {target_jornada} completada y enviada.\n"
-            
             with open(LOG_FILE, "a", encoding="utf-8") as f:
-                f.write(linea_log)
-            
-            if os.path.exists(BUFFER_FILE):
-                os.remove(BUFFER_FILE)
+                f.write(f"{fecha_log} : ✅ Jornada {target_jornada} completada y enviada.\n")
             print("🏁 Newsletter enviada con éxito.")
-
-    else:
-        print("⚽ Aún se está jugando o faltan datos.")
 
 if __name__ == "__main__":
     main()
