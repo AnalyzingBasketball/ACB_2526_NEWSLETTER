@@ -16,7 +16,7 @@ LOG_FILE = "data/log.txt"
 BUFFER_FILE = "data/buffer_control.txt"
 
 # 🚨 INTERRUPTOR DE PRUEBAS 🚨
-MODO_PRUEBA = True  
+MODO_PRUEBA = False  
 
 # API Key y Headers
 API_KEY = '0dd94928-6f57-4c08-a3bd-b1b2f092976e'
