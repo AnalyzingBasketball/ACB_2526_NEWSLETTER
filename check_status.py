@@ -11,9 +11,12 @@ import random
 # ==============================================================================
 TEMPORADA = '2025'
 COMPETICION = '1'
-HORAS_BUFFER = 0    # En 0 porque ejecutamos una vez al día
 LOG_FILE = "data/log.txt"
 BUFFER_FILE = "data/buffer_control.txt"
+
+# 🚨 INTERRUPTOR DE PRUEBAS 🚨
+# Cambia a True para probar sin esperas. Cámbialo a False para la ejecución real automatizada.
+MODO_PRUEBA = True  
 
 # API Key y Headers
 API_KEY = '0dd94928-6f57-4c08-a3bd-b1b2f092976e'
@@ -48,7 +51,6 @@ def get_last_jornada_from_log():
     return last_jornada
 
 def get_game_ids(temp_id, comp_id, jornada_id):
-    # FASE 1: Consultar la API para obtener el ID interno (roundId) de la jornada
     url_base = f"https://api2.acb.com/api/seasondata/Competition/matches?competitionId={comp_id}"
     print(f"🔍 Fase 1: Obteniendo mapeo de rondas para la Jornada {jornada_id}...")
     ids = []
@@ -60,7 +62,6 @@ def get_game_ids(temp_id, comp_id, jornada_id):
         if r_base.status_code == 200:
             data = r_base.json()
             
-            # Buscar el roundId que corresponde al roundNumber (jornada_id)
             rondas = data.get('availableFilters', {}).get('rounds', [])
             round_id_interno = None
             
@@ -75,7 +76,6 @@ def get_game_ids(temp_id, comp_id, jornada_id):
                 
             print(f"🔗 Correspondencia encontrada: Jornada {jornada_id} = roundId {round_id_interno}")
             
-            # FASE 2: Pedir a la API los partidos exactos de ese roundId
             url_jornada = f"https://api2.acb.com/api/seasondata/Competition/matches?competitionId={comp_id}&roundId={round_id_interno}"
             print(f"🔍 Fase 2: Extrayendo partidos del roundId {round_id_interno}...")
             
@@ -84,7 +84,6 @@ def get_game_ids(temp_id, comp_id, jornada_id):
             
             if r_jornada.status_code == 200:
                 data_jornada = r_jornada.json()
-                # Extraer la lista de partidos de la clave "matches"
                 partidos = data_jornada.get('matches', [])
                 
                 for partido in partidos:
@@ -123,7 +122,6 @@ def is_game_finished(game_id):
 def ejecutar_secuencia_completa(jornada):
     print(f"🔄 Iniciando secuencia completa para Jornada {jornada}...")
 
-    # PASO 0: SCRAPER
     NOMBRE_SCRIPT_DATOS = "boxscore_ACB_headless.py"
     print(f"📥 0. Ejecutando {NOMBRE_SCRIPT_DATOS}...")
     try:
@@ -133,7 +131,6 @@ def ejecutar_secuencia_completa(jornada):
         print(f"❌ Error crítico actualizando datos: {e}")
         return False
 
-    # PASO 1: IA
     print("🤖 1. Ejecutando ai_writer.py...")
     try:
         subprocess.run(["python", "ai_writer.py"], check=True, text=True)
@@ -141,7 +138,6 @@ def ejecutar_secuencia_completa(jornada):
         print(f"❌ Error crítico en ai_writer: {e}")
         return False
 
-    # PASO 2: EMAIL
     print("📧 2. Ejecutando email_sender.py...")
     try:
         subprocess.run(["python", "email_sender.py"], check=True, text=True)
@@ -151,7 +147,7 @@ def ejecutar_secuencia_completa(jornada):
         return False
 
 # ==============================================================================
-# MAIN (CON FACTOR HUMANO)
+# MAIN 
 # ==============================================================================
 
 def main():
@@ -163,12 +159,10 @@ def main():
 
     game_ids = get_game_ids(TEMPORADA, COMPETICION, str(target_jornada))
     
-    # 1. BLINDAJE: Si hay menos de 8 partidos, no hacemos nada.
     if len(game_ids) < 8:
         print(f"⚠️ Solo veo {len(game_ids)} partidos. Faltan datos o ha cambiado la API. No envío nada.")
         return
 
-    # 2. COMPROBACIÓN: ¿Están todos acabados?
     finished_count = 0
     for gid in game_ids:
         if is_game_finished(gid):
@@ -176,21 +170,22 @@ def main():
     
     print(f"📊 Estado: {finished_count}/{len(game_ids)} terminados.")
 
-    # NUEVO FILTRO: Definimos el mínimo de partidos terminados para lanzar la newsletter (Ej: 7 de 9)
+    # Filtro: Mínimo de partidos terminados (Ej: 7 de 9)
     MIN_PARTIDOS_TERMINADOS = 7
 
     if finished_count >= MIN_PARTIDOS_TERMINADOS:
         print(f"✅ Jornada dada por terminada ({finished_count} jugados de {len(game_ids)}).")
         
-        # --- EL TRUCO DEL FACTOR HUMANO ---
-        minutos_espera = random.randint(5, 45)
-        print(f"☕ Simulando comportamiento humano... Esperando {minutos_espera} minutos antes de enviar.")
-        print("zzz...")
-        
-        time.sleep(minutos_espera * 60) # Pausa aleatoria
-        
-        print("⏰ ¡Despierta! Enviando ahora.")
-        # ----------------------------------
+        # --- CONTROL DE ESPERA (MODO PRUEBA) ---
+        if MODO_PRUEBA:
+            print("🚀 MODO PRUEBA ACTIVADO: Disparando secuencia instantáneamente, sin esperas.")
+        else:
+            minutos_espera = random.randint(5, 45)
+            print(f"☕ Simulando comportamiento humano... Esperando {minutos_espera} minutos antes de enviar.")
+            print("zzz...")
+            time.sleep(minutos_espera * 60) 
+            print("⏰ ¡Despierta! Enviando ahora.")
+        # --------------------------------------
 
         exito = ejecutar_secuencia_completa(target_jornada)
         
@@ -201,7 +196,6 @@ def main():
             with open(LOG_FILE, "a", encoding="utf-8") as f:
                 f.write(linea_log)
             
-            # Limpieza por si acaso
             if os.path.exists(BUFFER_FILE):
                 os.remove(BUFFER_FILE)
             print("🏁 Newsletter enviada con éxito.")
