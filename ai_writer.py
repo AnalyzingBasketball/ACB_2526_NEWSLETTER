@@ -116,12 +116,13 @@ for col in cols_num:
     if col in df.columns:
         df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
 
-# --- CORRECCIÓN PARA RECIBIR LA JORNADA EXACTA DE CHECK_STATUS ---
+# Siempre definimos jornadas_unicas para evitar NameError más adelante
+jornadas_unicas = sorted(df['Week'].unique(), key=extraer_numero_jornada)
+
 if len(sys.argv) > 1:
     num_jornada_objetivo = int(sys.argv[1])
     ultima_jornada_label = f"Jornada {num_jornada_objetivo}"
 else:
-    jornadas_unicas = sorted(df['Week'].unique(), key=extraer_numero_jornada)
     ultima_jornada_label = jornadas_unicas[-1]
 
 df_week = df[df['Week'] == ultima_jornada_label]
