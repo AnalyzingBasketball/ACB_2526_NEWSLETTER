@@ -1,19 +1,21 @@
-ASUNTO: Hlinason, MVP de la Jornada 28 en una ofensiva de Bilbao
+ASUNTO: Bozic y Pustovyi comparten el MVP de la Jornada 24
 
-## Informe Liga Endesa: Jornada 28
+## Informe Liga Endesa: Jornada 24
 
 ### MVP y Puntos Clave
-Tryggvi Hlinason fue el MVP de la jornada con **25** de valoración. Consiguió **15** puntos con un **76.8**% de TS%. Sumó **9** rebotes y **3** asistencias. Su USG% fue solo del **16.5**%. Es una barbaridad. Produjo **15** puntos y **9** rebotes con una presencia ofensiva mínima. Esa capacidad de impactar sin dominar el balón es oro. No es un jugador que busque el highlight, pero su impacto en el marcador es innegable. Bilbao Basket se llevó la victoria, y su trabajo en la pintura fue clave.
+Luka Bozic (Covirán Granada) y Artem Pustovyi (MoraBanc Andorra) terminaron empatados con **35** de valoración, los co-MVPs de la Jornada 24. Bozic lideró a su equipo a la victoria con **25** puntos, una eficiencia brutal del **76.8**% de TS% y sumó **7** rebotes y **4** asistencias. Su USG% del **25.5**% indica que fue el motor ofensivo de Granada, pero sin acaparar el balón de forma excesiva. Cuando el balón pasa por sus manos, produce. Un rendimiento total para un jugador que sabe leer el partido.
 
-Darrun Hilliard, compañero de Hlinason, también jugó a un nivel altísimo. **23** de valoración, **21** puntos con un **82.3**% de TS%. Un tirador que estaba en racha. Su puntería abrió la cancha. Que dos jugadores rindan a este nivel de forma tan eficiente en el mismo partido es algo que pocos equipos pueden permitirse. Bilbao funcionó como un reloj ofensivo.
+Pustovyi, a pesar de la derrota de MoraBanc Andorra, fue una fuerza imparable con **23** puntos y **13** rebotes. Su **82.4**% de TS% es una barbaridad para un pívot que asume tanto. El USG% del **32.4**% muestra que el ataque andorrano pasó por él. Dominó la pintura, y lo hizo con una eficacia que pocos pueden igualar, aunque no se tradujera en triunfo colectivo. Dos partidos de altísimo nivel individual, con perfiles distintos: Bozic más generador, Pustovyi más finalizador puro.
+
+James Batemon (Hiopos Lleida) también dejó una marca importante con **29** de valoración, **25** puntos, **7** rebotes y **4** asistencias. Su partido fue otra demostración de que la brillantez individual no siempre va de la mano con la victoria del equipo.
 
 ### Radar de Eficiencia
-El ataque de Bilbao Basket fue el mejor de la jornada con **110.1** puntos por **100** posesiones. Jaume Ponsarnau ha encontrado la fórmula para que el equipo anote con facilidad. No es solo la cantidad, es la forma. La mejor fluidez, con **24.9** asistencias por **100** posesiones, confirma que el balón vuela. No tienen un anotador que monopolice, pero juegan juntos. Eso genera un baloncesto dinámico que es difícil de parar.
+La Laguna Tenerife de Txus Vidorreta fue el equipo más eficiente de la jornada en varios frentes. Lideraron el ataque con **150.2** puntos por **100** posesiones, una cifra que no es habitual ver y que pocos equipos pueden alcanzar. Su fluidez también fue la mejor, con **34.9** asistencias por **100** posesiones. El balón se mueve solo y siempre encuentra la mejor opción, sin forzar situaciones.
 
-Casademont Zaragoza, en cambio, tuvo el peor ataque con **107.5** puntos por **100** posesiones. A Joan Plaza le cuesta encontrar regularidad ofensiva en el equipo. No basta con la intención. Pero el dato curioso es que fueron el equipo con mejor control, solo **14.4** pérdidas por **100** posesiones. No es el baloncesto más vistoso, pero la disciplina para no regalar balones está ahí. Tienen que traducir ese control en puntos.
+Además, demostraron un control del juego superior al resto, con solo **9.1** pérdidas por **100** posesiones. No regalan nada. Txus Vidorreta tiene un equipo que sabe a qué juega, y lo ejecuta con una precisión que desarma cualquier defensa. Son un ejemplo de baloncesto colectivo. Por el otro lado, San Pablo Burgos (Porfi Fisac) tuvo el peor ataque de la jornada, quedándose en **88.9** puntos por **100** posesiones. Un contraste brutal con la maquinaria tinerfeña, que funciona a otro ritmo.
 
 ### Nombre Propio
-Darrun Hilliard fue el nombre propio de la jornada. Su valoración media en temporada es de **9.1**, pero esta jornada se disparó a **23**. Un salto de **+13.9**. Anotó **21** puntos con un TS% del **82.3**%. Cuando Hilliard entra en racha, Bilbao Basket tiene un anotador de primer nivel. Es una barbaridad de diferencia respecto a su media. Su impacto va más allá de los puntos, da un respiro al resto del ataque.
+Andrés Feliz (Real Madrid) fue el outsider de la jornada. Su valoración de **24** contrasta con su media de temporada de **6.9**. Una subida de **+17.1** puntos. En esta jornada sumó **17** puntos, **7** rebotes y **4** asistencias con un **69.7**% de TS%. Es el tipo de actuación que demuestra que un jugador puede tener un impacto decisivo cuando se le dan los minutos. Un buen aviso para el resto de la liga.
 
 ### En Racha (3 jornadas)
 - Luka Bozic (COV): **32.5** VAL, **21.5** PTS, **5.5** AST, TS%: **82.5**%.
