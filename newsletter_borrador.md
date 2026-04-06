@@ -1,25 +1,26 @@
-ASUNTO: Bozic y Pustovyi comparten el MVP de la Jornada 24
+ASUNTO: Ejim domina la Jornada 25 con **39** de valoración
 
-## Informe Liga Endesa: Jornada 24
+## Informe Liga Endesa: Jornada 25
 
 ### MVP y Puntos Clave
-Luka Bozic (Covirán Granada) y Artem Pustovyi (MoraBanc Andorra) terminaron empatados con **35** de valoración, los co-MVPs de la Jornada 24. Bozic lideró a su equipo a la victoria con **25** puntos, una eficiencia brutal del **76.8**% de TS% y sumó **7** rebotes y **4** asistencias. Su USG% del **25.5**% indica que fue el motor ofensivo de Granada, pero sin acaparar el balón de forma excesiva. Cuando el balón pasa por sus manos, produce. Un rendimiento total para un jugador que sabe leer el partido.
+Melvin Ejim (Hiopos Lleida) firmó la mejor actuación de la jornada con **39** de valoración. Es una barbaridad. Lideró a su equipo a la victoria con **29** puntos, mostrando una eficiencia brutal con un **85.5**% de TS%. No solo anotó. Sus **9** rebotes y un USG% de solo el **26.7**% demuestran una producción tremenda sin necesitar monopolizar el balón. Un rendimiento completo. Fue clave para Lleida.
 
-Pustovyi, a pesar de la derrota de MoraBanc Andorra, fue una fuerza imparable con **23** puntos y **13** rebotes. Su **82.4**% de TS% es una barbaridad para un pívot que asume tanto. El USG% del **32.4**% muestra que el ataque andorrano pasó por él. Dominó la pintura, y lo hizo con una eficacia que pocos pueden igualar, aunque no se tradujera en triunfo colectivo. Dos partidos de altísimo nivel individual, con perfiles distintos: Bozic más generador, Pustovyi más finalizador puro.
+Gonzalo Corbalán (San Pablo Burgos) se quedó cerca con **34** de valoración. Sus **27** puntos y un **86.3**% de TS% fueron fundamentales en la victoria de Burgos. Una jornada donde la eficiencia en el tiro fue la tónica dominante en los partidos ganadores. No perdonaron. Su compañero Jermaine Samuels también destacó, con **19** puntos y un **101.9**% de TS%. Son números de otro nivel. Difícil de defender cuando dos jugadores rinden así.
 
-James Batemon (Hiopos Lleida) también dejó una marca importante con **29** de valoración, **25** puntos, **7** rebotes y **4** asistencias. Su partido fue otra demostración de que la brillantez individual no siempre va de la mano con la victoria del equipo.
+Luka Bozic (Covirán Granada) continuó su buena racha. A pesar de la derrota de su equipo, sumó **32** de valoración con **19** puntos y **7** rebotes, y un **88.3**% de TS%. Es un jugador que sigue sumando. Su impacto se nota, aunque el resultado colectivo no acompañe. En Zaragoza, Bojan Dubljevic alcanzó un **100.0**% de TS% con **18** puntos. Un dato que llama la atención. Santi Yusta anotó **32** puntos, una cifra individual muy alta, pero no fue suficiente.
 
 ### Radar de Eficiencia
-La Laguna Tenerife de Txus Vidorreta fue el equipo más eficiente de la jornada en varios frentes. Lideraron el ataque con **150.2** puntos por **100** posesiones, una cifra que no es habitual ver y que pocos equipos pueden alcanzar. Su fluidez también fue la mejor, con **34.9** asistencias por **100** posesiones. El balón se mueve solo y siempre encuentra la mejor opción, sin forzar situaciones.
+Hiopos Lleida (Gerard Encuentra) dominó en ambos lados de la cancha. Fue el mejor ataque de la jornada con **139.6** puntos por **100** posesiones. Una cifra que pocas veces se ve. Al mismo tiempo, demostraron un control del balón excepcional, con solo **5.4** pérdidas por **100** posesiones. Gerard Encuentra tiene a su equipo jugando con una precisión que desarma a los rivales. Ritmo alto y cero regalos. Una combinación letal. Así se ganan partidos.
 
-Además, demostraron un control del juego superior al resto, con solo **9.1** pérdidas por **100** posesiones. No regalan nada. Txus Vidorreta tiene un equipo que sabe a qué juega, y lo ejecuta con una precisión que desarma cualquier defensa. Son un ejemplo de baloncesto colectivo. Por el otro lado, San Pablo Burgos (Porfi Fisac) tuvo el peor ataque de la jornada, quedándose en **88.9** puntos por **100** posesiones. Un contraste brutal con la maquinaria tinerfeña, que funciona a otro ritmo.
+El Real Madrid (Sergio Scariolo) movió el balón mejor que nadie, con **33.3** asistencias por **100** posesiones. Su ataque es una máquina de generar ventajas. Siempre encuentran al hombre abierto. La fluidez ofensiva es su sello. Pocos equipos pueden igualar ese nivel de circulación.
+En el otro extremo, el Joventut Badalona (Dani Miret) firmó el peor ataque de la jornada con **90.1** puntos por **100** posesiones. Una cifra que penaliza y que refleja las dificultades ofensivas que atraviesa el equipo. No encuentran soluciones. Es un problema recurrente.
 
 ### Nombre Propio
-Andrés Feliz (Real Madrid) fue el outsider de la jornada. Su valoración de **24** contrasta con su media de temporada de **6.9**. Una subida de **+17.1** puntos. En esta jornada sumó **17** puntos, **7** rebotes y **4** asistencias con un **69.7**% de TS%. Es el tipo de actuación que demuestra que un jugador puede tener un impacto decisivo cuando se le dan los minutos. Un buen aviso para el resto de la liga.
+Tim Abromaitis (La Laguna Tenerife) dio un salto importante esta jornada. De una media de **4.8** de valoración en la temporada, esta jornada se fue hasta los **23**. Un incremento de **+18.2**. Anotó **17** puntos y capturó **5** rebotes. Una actuación que su equipo necesita ver más a menudo para escalar posiciones. Cuando Abromaitis está así, Tenerife es otro equipo. Es el tipo de jugador que, si recupera su nivel, cambia la cara a un partido.
 
 ### En Racha (3 jornadas)
-- Luka Bozic (COV): **32.5** VAL, **21.5** PTS, **5.5** AST, TS%: **82.5**%.
-- Artem Pustovyi (MBA): **28.5** VAL, **21.0** PTS, **0.5** AST, TS%: **76.8**%.
-- Ethan Happ (BUR): **27.0** VAL, **22.0** PTS, **2.0** AST, TS%: **68.4**%.
-- David DeJulius (UCM): **27.0** VAL, **26.5** PTS, **5.0** AST, TS%: **70.8**%.
-- Gonzalo Corbalán (BUR): **24.5** VAL, **20.5** PTS, **4.5** AST, TS%: **54.6**%.
+- Luka Bozic (COV): **33.5** VAL, **22.0** PTS, **4.0** AST, TS%: **82.5**%.
+- Sergio de Larrea (VBC): **26.0** VAL, **20.0** PTS, **7.0** AST, TS%: **75.1**%.
+- Artem Pustovyi (MBA): **25.0** VAL, **18.5** PTS, **1.5** AST, TS%: **77.1**%.
+- Gonzalo Corbalán (BUR): **25.0** VAL, **21.0** PTS, **3.0** AST, TS%: **67.2**%.
+- James Batemon (LLE): **25.0** VAL, **23.0** PTS, **2.0** AST, TS%: **78.3**%.
