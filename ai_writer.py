@@ -9,7 +9,7 @@ import time # Añadido para gestionar las pausas de la IA
 # ==============================================================================
 # 1. CONFIGURACIÓN ESPECIAL LIGA ENDESA (ACB)
 # ==============================================================================
-MODEL_NAME = "gemini-2.5-flash"
+MODEL_NAME = "gemini-1.5-flash"
 FILE_PATH = "data/BoxScore_ACB_2025_Cumulative.csv"
 
 # Mapa de Equipos (Los 18 de la Liga Endesa)
