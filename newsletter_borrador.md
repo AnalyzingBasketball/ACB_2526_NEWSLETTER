@@ -1,14 +1,14 @@
-ASUNTO: Jornada 26 ACB: La Explosión Anotadora de DeJulius y la Eficiencia Táctica Colectiva
+ASUNTO: Jornada 26 Liga Endesa: La Explosión Ofensiva de DeJulius y las Claves Tácticas
 
 ## Informe Liga Endesa: Jornada 26
 
 ### MVP y Puntos Clave de la Jornada
-La Jornada **26** ha sido testigo de una exhibición anotadora superlativa de David DeJulius, el base del UCAM Murcia, quien se alzó como el MVP indiscutible con **38** de valoración. Sus **31** puntos, alcanzados con un impresionante **82.6**% de True Shooting, subrayan una ejecución ofensiva casi perfecta, a pesar de registrar **0** rebotes, confirmando su rol como generador principal en la cancha.
+La Jornada **26** de la Liga Endesa coronó a David DeJulius, el exterior del UCAM Murcia, como el MVP destacado con **38** de valoración. Su exhibición ofensiva incluyó **31** puntos con una eficiencia asombrosa del **82.6**% en True Shooting, marcando una actuación fundamental para los universitarios. La capacidad del jugador murcianista para producir sin ceder balones y ejecutar cada posesión con precisión resalta la dificultad de dominar en una liga tan exigente.
 
-Este rendimiento individual resulta vital para el cuadro universitario en la ajustada pugna por las posiciones de privilegio en la larga fase regular ACB, donde cada victoria consolida ambiciones. Se observa una secuencia donde DeJulius, tras un *pick & roll central*, aprovecha el *colapso defensivo* para un *tiro tras bote* de media distancia, o una penetración culminada con una bandeja o tiros libres, maximizando su eficiencia.
+El impacto de DeJulius trascendió el dato puro de anotación. Se observó su maestría en el pick & roll central, donde su lectura permitía tanto el tiro tras bote con espacio como la generación de ventajas para el lado débil, que los compañeros del conjunto de Sito Alonso supieron capitalizar, alineado con la alta fluidez de **29.9** asistencias por cada **100** posesiones del UCAM. Esta victoria es crucial para la estabilidad de los granas en la zona alta de la clasificación, donde cada triunfo fuera de casa se valora doble.
 
 ### Radar de Eficiencia y Pizarra Táctica
-Casademont Zaragoza, bajo la dirección de Joan Plaza, demostró ser un modelo de eficiencia ofensiva, liderando la jornada con **139.5** puntos por cada **100** posesiones y un control impecable del balón, con solo **7.8** pérdidas. Este ritmo se complementa con la fluidez que impregna Sito Alonso en el UCAM Murcia, cuya cifra de **29.9** asistencias por cada **100** posesiones evidencia una circulación de balón excepcional y una *generación de ventajas* constante en el *lado débil*, optimizando el *spacing* y facilitando la labor de sus anotadores.
+El Casademont Zaragoza de Joan Plaza desplegó el mejor ataque de la jornada, alcanzando **139.5** puntos por cada **100** posesiones, combinado con un control del balón ejemplar al registrar solo **7.8** pérdidas por **100**. Esta ratio subraya una ejecución ofensiva pulcra y un IQ colectivo alto, minimizando errores y maximizando la conversión. En contraste, la fluidez ofensiva del UCAM Murcia de Sito Alonso, con **29.9** asistencias por **100** posesiones, demostró su capacidad para mover el balón y generar buenos tiros, evidenciando una circulación dinámica que desgasta las defensas rivales.
 
 ### Jugadores en Racha (Últimas 3 Jornadas)
 - Luka Bozic (COV): **32.5** VAL, **22.0** PTS, **2.5** AST.
