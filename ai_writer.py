@@ -121,7 +121,14 @@ for col in cols_num:
 
 # Buscamos la última jornada registrada
 jornadas_unicas = sorted(df['Week'].unique(), key=extraer_numero_jornada)
-ultima_jornada_label = jornadas_unicas[-1]
+
+target_jornada_num = sys.argv[1] if len(sys.argv) > 1 else None
+if target_jornada_num:
+    matching = [j for j in jornadas_unicas if str(target_jornada_num) in str(j)]
+    ultima_jornada_label = matching[0] if matching else jornadas_unicas[-1]
+else:
+    ultima_jornada_label = jornadas_unicas[-1]
+
 df_week = df[df['Week'] == ultima_jornada_label]
 
 print(f"🤖 Analizando {ultima_jornada_label}...")
