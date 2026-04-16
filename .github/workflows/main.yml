@@ -33,6 +33,8 @@ jobs:
         GMAIL_PASSWORD: ${{ secrets.GMAIL_PASSWORD }}
         URL_SUSCRIPTORES: ${{ secrets.URL_SUSCRIPTORES }}
         MAKE_WEBHOOK_URL: ${{ secrets.MAKE_WEBHOOK_URL }}
+      env:
+        PYTHONUNBUFFERED: "1"
       run: python check_status.py
 
     - name: Guardar cambios en Data
