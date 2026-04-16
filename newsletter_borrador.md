@@ -1,14 +1,14 @@
-ASUNTO: Jornada **28** Liga Endesa: Hlinason impulsa la ofensiva de Bilbao Basket; Zaragoza gestiona el ritmo
+ASUNTO: Jornada 26 ACB: La Explosión Anotadora de DeJulius y la Eficiencia Táctica Colectiva
 
-## Informe Liga Endesa: Jornada 28
+## Informe Liga Endesa: Jornada 26
 
 ### MVP y Puntos Clave de la Jornada
-El pívot islandés Tryggvi Hlinason, del Bilbao Basket, se erigió como el MVP de la Jornada **28** con **25** de valoración, firmando una actuación dominante. Sus **15** puntos con un True Shooting del **76.8**% y **9** rebotes subrayan su tremenda eficiencia en la pintura, capitalizando cada posesión.
+La Jornada **26** ha sido testigo de una exhibición anotadora superlativa de David DeJulius, el base del UCAM Murcia, quien se alzó como el MVP indiscutible con **38** de valoración. Sus **31** puntos, alcanzados con un impresionante **82.6**% de True Shooting, subrayan una ejecución ofensiva casi perfecta, a pesar de registrar **0** rebotes, confirmando su rol como generador principal en la cancha.
 
-Esta exhibición es vital para la estabilidad de los Hombres de Negro en el pulso liguero, donde cada victoria suma. El trabajo de Hlinason ancla el juego interior y permite al equipo de Jaume Ponsarnau desplegar su ofensiva, manteniendo las aspiraciones en una Liga Endesa implacable.
+Este rendimiento individual resulta vital para el cuadro universitario en la ajustada pugna por las posiciones de privilegio en la larga fase regular ACB, donde cada victoria consolida ambiciones. Se observa una secuencia donde DeJulius, tras un *pick & roll central*, aprovecha el *colapso defensivo* para un *tiro tras bote* de media distancia, o una penetración culminada con una bandeja o tiros libres, maximizando su eficiencia.
 
 ### Radar de Eficiencia y Pizarra Táctica
-El Bilbao Basket de Jaume Ponsarnau volvió a mostrar su identidad ofensiva, registrando el Mejor Ataque de la jornada con **110.1** puntos por cada **100** posesiones y una Fluidez de **24.9** asistencias por cada **100**. Esta cifra refleja un gran caudal de juego en la media cancha, con generación de ventajas constantes que Tryggvi Hlinason y Darrun Hilliard, con su **23** de valoración, supieron materializar. En contraste, el Casademont Zaragoza de Joan Plaza se centró en el Control, limitando sus pérdidas a **14.4** por cada **100** posesiones, buscando un ritmo pausado para optimizar sus ataques. La eficacia de Hlinason en el pick & roll central, explotando los colapsos defensivos, fue un motor clave para los bilbaínos, mientras el cuadro maño buscaba explotar el mismatch.
+Casademont Zaragoza, bajo la dirección de Joan Plaza, demostró ser un modelo de eficiencia ofensiva, liderando la jornada con **139.5** puntos por cada **100** posesiones y un control impecable del balón, con solo **7.8** pérdidas. Este ritmo se complementa con la fluidez que impregna Sito Alonso en el UCAM Murcia, cuya cifra de **29.9** asistencias por cada **100** posesiones evidencia una circulación de balón excepcional y una *generación de ventajas* constante en el *lado débil*, optimizando el *spacing* y facilitando la labor de sus anotadores.
 
 ### Jugadores en Racha (Últimas 3 Jornadas)
 - Luka Bozic (COV): **32.5** VAL, **22.0** PTS, **2.5** AST.
