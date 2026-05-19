@@ -1,18 +1,18 @@
-ASUNTO: Jornada **31** ACB: La Explosión de Bozic y el Pulso Táctico de la Liga Endesa
+ASUNTO: Análisis Jornada 32: La Actuación Capital de Luka Bozic y las Claves Tácticas de la Eficiencia ACB
 
-## Informe Liga Endesa: Jornada 31
+## Informe Liga Endesa: Jornada 32
 
 ### MVP y Puntos Clave de la Jornada
-Luka Bozic, del Covirán Granada, acaparó el protagonismo individual de la Jornada **31** de la Liga Endesa con una valoración de **35**. Esta cifra subraya la influencia decisiva del jugador balcánico en su equipo, especialmente relevante para el conjunto nazarí en la pugna por la permanencia, donde cada victoria es vital en la larga y exigente liga regular.
+La Jornada **32** de la Liga Endesa destacó a Luka Bozic, del Covirán Granada, como el MVP de la fecha con una valoración de **37**. Esta actuación subraya la importancia de su liderazgo en un momento crucial de la temporada para el conjunto nazarí, en un contexto liguero donde cada victoria es vital para mantener las aspiraciones en una competición tan exigente.
 
-La jornada también destacó actuaciones de gran calibre como la de Darrun Hilliard, del Bilbao Basket, quien firmó **29** de valoración con **21** puntos y **5** rebotes, mostrando una eficiencia anotadora sobresaliente con un TS% del **93.8**%. Un posible instante clave pudo ser un tiro tras bote desde la cabecera, explotando un colapso defensivo tras un pick & roll central, donde su IQ y spacing permitieron capitalizar una ventaja creada en el lado débil.
+Ricky Rubio, el base de la Penya, también brilló con **27** de valoración, **21** puntos y un formidable **93.1**% de TS%. Su capacidad para generar ventajas desde el dribbling y su eficacia en el tiro tras bote ejemplifican la lectura táctica avanzada. Por su parte, Juani Marcos, el exterior del Barça, alcanzó los **27** de valoración con **18** puntos y un asombroso **101.4**% de TS%, destacando por su inteligencia para el corte a canasta y su aprovechamiento de cada posesión, además de aportar **6** rebotes cruciales.
 
 ### Radar de Eficiencia y Pizarra Táctica
-La Joventut, bajo la dirección de Dani Miret, evidenció un ritmo ofensivo superior, generando **136.1** puntos por cada cien posesiones, un dato que consolida la fluidez en su ataque estático y transiciones. Por otro lado, el Río Breogán de Luis Casimiro destacó por su notable circulación de balón, promediando **34.4** asistencias por cada cien posesiones, demostrando una excelente capacidad para mover la pelota y encontrar al jugador liberado. En el control del tempo, el UCAM Murcia de Sito Alonso minimizó errores con solo **8.4** pérdidas por cada cien posesiones, una métrica crucial para mantener la posesión y evitar contraataques rivales.
+En la parcela táctica, Baskonia, dirigido por Paolo Galbiati, confirma el mejor ataque de la liga con **149.2** puntos por cada **100** posesiones, reflejo de su alta velocidad y excelente spacing. La fluidez ofensiva es marca del Bilbao Basket de Jaume Ponsarnau, que reparte **30.1** asistencias por cada **100** posesiones, lo que garantiza una constante generación de ventajas. Por su parte, UCAM Murcia, bajo la batuta de Sito Alonso, exhibe un control encomiable del balón, con solo **9.3** pérdidas por cada **100** posesiones, minimizando errores y dictando el tempo.
 
 ### Jugadores en Racha (Últimas 3 Jornadas)
-- Mario Hezonja (RMB): **37.0** VAL, **28.0** PTS, **4.5** AST.
-- Luka Bozic (COV): **33.3** VAL, **21.3** PTS, **3.0** AST.
-- David DeJulius (UCM): **28.7** VAL, **25.7** PTS, **5.3** AST.
-- Ricky Rubio (JOV): **28.0** VAL, **23.0** PTS, **7.0** AST.
-- Kendrick Perry (UNI): **24.5** VAL, **19.5** PTS, **4.5** AST.
+- Luka Bozic (COV): **34.7** VAL, **22.3** PTS, **4.3** AST.
+- Ricky Rubio (JOV): **27.5** VAL, **22.0** PTS, **5.5** AST.
+- Alex Len (RMB): **26.0** VAL, **17.0** PTS, **0.0** AST.
+- Isaiah Wong (GCA): **24.3** VAL, **25.0** PTS, **3.3** AST.
+- Artem Pustovyi (MBA): **23.3** VAL, **17.7** PTS, **1.7** AST.
