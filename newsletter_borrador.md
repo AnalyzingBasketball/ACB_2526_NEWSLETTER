@@ -1,18 +1,21 @@
-ASUNTO: Jornada 33 ACB: La exhibición de Bozic, la eficiencia de Tenerife y el pulso por la salvación
+ASUNTO: Jornada 34 ACB: Hlinason domina la pintura, Murcia lidera la eficiencia ofensiva
 
-## Informe Liga Endesa: Jornada 33
+## Informe Liga Endesa: Jornada 34
 
 ### MVP y Puntos Clave de la Jornada
-La Jornada **33** de la Liga Endesa ha tenido en Luka Bozic, del Covirán Granada, a su jugador más destacado con **35** de valoración. Esta actuación sobresaliente de Bozic, donde su capacidad para generar ventajas desde el dribling y su lectura del juego fueron decisivas, se alza como pilar fundamental para el cuadro rojillo en su compleja lucha por la permanencia.
 
-Mientras tanto, la exhibición anotadora de Kyle Kuric, del MoraBanc Andorra, con **28** puntos y un **104.2**% de TS%, evidenció cómo la generación de espacios y el acierto en el tiro tras bloqueo indirecto pueden desatascar ataques frente a defensas colapsadas. Melwin Pantzar, del Bilbao Basket, también destacó con **20** puntos y un **77.9**% de TS%, mostrando una gran eficacia en la finalización.
+Tryggvi Hlinason, el pívot del Bilbao Basket, se erigió como el MVP de la Jornada **34** con una valoración excepcional de **35**. Su hoja estadística fue demoledora: **20** puntos con un True Shooting Percentage del **85.9**% y **11** rebotes. Esta actuación subraya la importancia capital de un interior dominante para los hombres de negro en el tramo final de una liga regular ACB, donde cada victoria es fundamental para consolidar posiciones.
+
+La eficiencia del islandés fue un factor determinante, traduciéndose en una producción constante cerca del aro que obligó a constantes ajustes defensivos. Con un dominio del rebote ofensivo, Hlinason generó segundas oportunidades que desatascaron el ataque de los vizcaínos, demostrando la capacidad de un pívot para forzar un colapso defensivo en situaciones de pick & roll o poste bajo, abriendo espacios para el resto del equipo.
 
 ### Radar de Eficiencia y Pizarra Táctica
-El dominio táctico en la Liga Endesa se observa en la capacidad para optimizar cada posesión. El La Laguna Tenerife de Txus Vidorreta se reafirma como el ataque más eficiente con **146.9** puntos por cada **100** posesiones, a la vez que lidera en control con solo **8.1** pérdidas por cada **100** posesiones. Esta minimización de errores permite al conjunto aurinegro mantener un alto volumen de tiros de calidad. Por su parte, el Unicaja de Ibon Navarro demuestra una fluidez ofensiva excepcional, registrando **30.9** asistencias por cada **100** posesiones, señal de un baloncesto coral y una alta IQ de pase que genera constantes mismatches.
+
+La Liga Endesa cierra la fase regular con datos de eficiencia que marcan estilos. UCAM Murcia, bajo la dirección de Sito Alonso, cierra como el mejor ataque con **134.9** puntos por **100** posesiones, reflejo de su intensidad y capacidad anotadora. Por su parte, el San Pablo Burgos de Porfi Fisac destaca por su fluidez, alcanzando las **31.5** asistencias por **100** posesiones, una cifra que evidencia la circulación de balón y la generación de ventajas para el tiro liberado. En el apartado de control, el Bàsquet Girona de Moncho Fernández minimiza los errores con solo **7.0** pérdidas por **100** posesiones, priorizando la seguridad y la disciplina táctica en cada posesión.
 
 ### Jugadores en Racha (Últimas 3 Jornadas)
-- Luka Bozic (COV): **35.7** VAL, **21.3** PTS, **5.3** AST.
-- Ricky Rubio (JOV): **24.7** VAL, **18.0** PTS, **5.3** AST.
-- Timothé Luwawu-Cabarrot (BKN): **24.0** VAL, **22.0** PTS, **1.5** AST.
-- Tim Abromaitis (TEN): **23.7** VAL, **16.7** PTS, **0.3** AST.
-- Kendrick Perry (UNI): **22.3** VAL, **16.3** PTS, **6.7** AST.
+
+- Luka Bozic (COV): **32.0** VAL, **19.7** PTS, **6.0** AST.
+- Tryggvi Hlinason (SBB): **23.7** VAL, **13.0** PTS, **2.0** AST.
+- Ricky Rubio (JOV): **23.0** VAL, **15.5** PTS, **4.5** AST.
+- Oriol Paulí (LLE): **21.7** VAL, **16.0** PTS, **3.0** AST.
+- Francis Alonso (BRE): **21.7** VAL, **21.0** PTS, **2.0** AST.
